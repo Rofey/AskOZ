@@ -1,0 +1,50 @@
+[project]
+name = "askoz"
+version = "0.1.0"
+description = "Independent AI assistant that answers questions from official Australian government sources."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+# Runtime dependencies. We add to this list phase by phase, so every
+# dependency arrives together with the code that needs it.
+dependencies = [
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "psycopg[binary]>=3.2",
+    "redis>=5.2",
+    "structlog>=24.4",
+]
+
+[project.scripts]
+askoz = "askoz.cli:main"
+
+# Dev-only tools: never installed in the production image.
+[dependency-groups]
+dev = [
+    "ruff>=0.8",
+    "pyright>=1.1.390",
+    "pytest>=8.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F: errors, I: import order, B: likely bugs, UP: modern syntax,
+# SIM: simplifications, RUF: ruff-specific checks.
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
+include = ["src", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: needs the docker compose services running"]
+# Unit tests run by default; run integration tests with: uv run pytest -m integration
+addopts = "-m 'not integration'"
