@@ -51,6 +51,12 @@ def main() -> None:
     crawl = sub.add_parser("crawl", help="crawl one source into raw page storage")
     crawl.add_argument("source")
     crawl.add_argument("--limit", type=int, help="stop after storing this many pages")
+    ingest = sub.add_parser("ingest", help="clean, chunk and embed crawled pages into pgvector")
+    ingest.add_argument("--source", help="only this source (default: all)")
+    ingest.add_argument("--limit", type=int, help="only the first N pages")
+    ingest.add_argument(
+        "--rebuild", action="store_true", help="re-index everything (after changing chunking)"
+    )
     args = parser.parse_args()
 
     # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
@@ -74,3 +80,13 @@ def main() -> None:
         if args.source not in SOURCES:
             parser.error(f"unknown source {args.source!r}; choose from {', '.join(SOURCES)}")
         run_crawl(args.source, limit=args.limit)
+    elif args.command == "ingest":
+        from askoz.ingest.pipeline import ingest
+
+        stats = ingest(source=args.source, limit=args.limit, rebuild=args.rebuild)
+        log.info(
+            "ingest_done",
+            pages=stats.pages,
+            skipped_no_content=stats.skipped_no_content,
+            chunks_written=stats.chunks_written,
+        )

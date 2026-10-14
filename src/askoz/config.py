@@ -26,6 +26,8 @@ class Settings(BaseSettings):
 
     # Where raw crawled pages are stored. Local disk in dev; object storage in prod.
     blob_dir: Path = Path("data/blobs")
+    # Downloaded ML models (embedding model weights etc.).
+    models_dir: Path = Path("data/models")
     # Shown in the crawler's User-Agent so site operators can identify and contact us.
     # The URL should explain what the bot is (the repo README works). Some sites
     # (e.g. the ATO) reject bots without a URL, so `askoz crawl` requires one.
