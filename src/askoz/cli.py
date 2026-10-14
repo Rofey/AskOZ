@@ -46,7 +46,31 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="askoz")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="check connectivity to Postgres and Redis")
+    sub.add_parser("migrate", help="apply pending database migrations")
+    sub.add_parser("sources", help="list crawlable sources")
+    crawl = sub.add_parser("crawl", help="crawl one source into raw page storage")
+    crawl.add_argument("source")
+    crawl.add_argument("--limit", type=int, help="stop after storing this many pages")
     args = parser.parse_args()
 
+    # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
     if args.command == "doctor":
         sys.exit(doctor())
+    elif args.command == "migrate":
+        from askoz.db import migrate
+
+        applied = migrate()
+        log.info("migrations_applied", versions=applied or "none pending")
+    elif args.command == "sources":
+        from askoz.crawl.sources import SOURCES
+
+        for source in SOURCES.values():
+            mode = "sitemap" if source.sitemap_url else "links"
+            print(f"{source.name:20} {mode:8} {source.domain}")
+    elif args.command == "crawl":
+        from askoz.crawl.runner import run_crawl
+        from askoz.crawl.sources import SOURCES
+
+        if args.source not in SOURCES:
+            parser.error(f"unknown source {args.source!r}; choose from {', '.join(SOURCES)}")
+        run_crawl(args.source, limit=args.limit)

@@ -26,3 +26,18 @@ def test_prod_requires_api_keys(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("ASKOZ_ENV", "prod")
     with pytest.raises(ValidationError, match="missing required settings"):
         Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+
+
+def test_crawl_contact_validation(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ASKOZ_CRAWL_CONTACT_URL", "github.com/no-scheme")
+    with pytest.raises(ValidationError, match="crawl_contact_url"):
+        Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+    monkeypatch.setenv("ASKOZ_CRAWL_CONTACT_URL", "https://github.com/x/askoz")
+    monkeypatch.setenv("ASKOZ_CRAWL_CONTACT_EMAIL", "not-an-email")
+    with pytest.raises(ValidationError, match="crawl_contact_email"):
+        Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+
+
+def test_empty_crawl_contact_means_unset(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ASKOZ_CRAWL_CONTACT_URL", "")
+    assert Settings(_env_file=None).crawl_contact_url is None  # pyright: ignore[reportCallIssue]

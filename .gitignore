@@ -15,6 +15,7 @@ build/
 
 # Local data (crawl output, caches)
 data/
+.scrapy/
 .ipynb_checkpoints/
 
 # Editors / OS
