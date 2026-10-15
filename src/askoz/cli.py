@@ -57,6 +57,17 @@ def main() -> None:
     ingest.add_argument(
         "--rebuild", action="store_true", help="re-index everything (after changing chunking)"
     )
+    search = sub.add_parser("search", help="search the index")
+    search.add_argument("question")
+    search.add_argument("--mode", default="hybrid", help="vector | keyword | hybrid | rerank")
+    search.add_argument("-k", type=int, default=5, help="number of results")
+    search.add_argument(
+        "--instruct", action="store_true", help="add bge's query instruction prefix"
+    )
+    compare = sub.add_parser("compare", help="run one question through every search mode")
+    compare.add_argument("question")
+    compare.add_argument("-k", type=int, default=5)
+    compare.add_argument("--instruct", action="store_true")
     args = parser.parse_args()
 
     # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
@@ -90,3 +101,18 @@ def main() -> None:
             skipped_no_content=stats.skipped_no_content,
             chunks_written=stats.chunks_written,
         )
+    elif args.command in ("search", "compare"):
+        from askoz.retrieval.search import MODES, Mode, Searcher
+
+        if args.command == "search" and args.mode not in MODES:
+            parser.error(f"--mode must be one of {', '.join(MODES)}")
+        modes: list[Mode] = [args.mode] if args.command == "search" else list(MODES)
+        searcher = Searcher(query_instruction=args.instruct)
+        for mode in modes:
+            print(f"\n=== {mode} ===")
+            results = searcher.search(args.question, mode=mode, top_k=args.k)
+            for rank, result in enumerate(results, 1):
+                meta = result.node.metadata
+                section = (meta.get("header_path") or "/").strip("/").split("/")[-1]
+                print(f"{rank}. [{result.score or 0:.3f}] {meta['title']} > {section or '(top)'}")
+                print(f"   {meta['url']}")
