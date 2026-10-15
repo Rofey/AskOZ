@@ -17,14 +17,19 @@ RRF_K = 60
 
 
 def reciprocal_rank_fusion(
-    result_lists: list[list[NodeWithScore]], *, k: int = RRF_K
+    result_lists: list[list[NodeWithScore]],
+    *,
+    k: int = RRF_K,
+    weights: list[float] | None = None,
 ) -> list[NodeWithScore]:
+    """`weights` (one per list, default 1.0) let a more trusted list count for more."""
+    weights = weights or [1.0] * len(result_lists)
     scores: dict[str, float] = {}
     nodes: dict[str, NodeWithScore] = {}
-    for results in result_lists:
+    for results, weight in zip(result_lists, weights, strict=True):
         for rank, result in enumerate(results, start=1):
             node_id = result.node.node_id
-            scores[node_id] = scores.get(node_id, 0.0) + 1.0 / (k + rank)
+            scores[node_id] = scores.get(node_id, 0.0) + weight / (k + rank)
             nodes.setdefault(node_id, result)
     ranked = sorted(scores, key=lambda node_id: scores[node_id], reverse=True)
     return [NodeWithScore(node=nodes[node_id].node, score=scores[node_id]) for node_id in ranked]

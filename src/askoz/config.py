@@ -36,6 +36,10 @@ class Settings(BaseSettings):
 
     voyage_api_key: SecretStr | None = None
     anthropic_api_key: SecretStr | None = None
+    # Claude models. Both default to the current Opus; the rewriter runs at low
+    # effort. Switch either one by env var and compare with `askoz eval`.
+    answer_model: str = "claude-opus-5-5"
+    rewrite_model: str = "claude-opus-5-5"
 
     @field_validator("crawl_contact_url", "crawl_contact_email")
     @classmethod

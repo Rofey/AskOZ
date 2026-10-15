@@ -69,7 +69,43 @@ def validate(golden: GoldenSet) -> list[str]:
     return problems
 
 
-def ranked_pages(searcher: Searcher, question: str, mode: Mode) -> list[str]:
+# Search modes, plus "rewrite": the Phase 6 query planner followed by multi-query
+# vector search, i.e. exactly what `askoz ask` retrieves. It calls Claude once per
+# question, so it costs money: about $0.01 per question at low effort on Opus.
+EvalMode = Mode | Literal["rewrite"]
+
+
+PLAN_CACHE = Path("data/eval/plan_cache.json")
+
+
+def cached_plan(question: str) -> list[str]:
+    """The rewriter's queries for a question, cached per rewrite model.
+
+    The rewriter is an LLM, so it phrases things a little differently each run.
+    Caching makes retrieval experiments compare like with like (and free after
+    the first run). Delete the cache to evaluate a new rewrite prompt or model.
+    """
+    from askoz.answer.rewrite import plan_queries
+    from askoz.config import get_settings
+
+    cache = json.loads(PLAN_CACHE.read_text(encoding="utf-8")) if PLAN_CACHE.exists() else {}
+    key = f"{get_settings().rewrite_model}|{question}"
+    if key not in cache:
+        cache[key] = plan_queries(question).search_queries
+        PLAN_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        PLAN_CACHE.write_text(json.dumps(cache, indent=2), encoding="utf-8")
+    return cache[key]
+
+
+def ranked_pages(searcher: Searcher, question: str, mode: EvalMode) -> list[str]:
+    if mode == "rewrite":
+        from askoz.answer.context import group_into_pages, ranked_chunks
+
+        queries = [question, *cached_plan(question)]
+        return [
+            p.url for p in group_into_pages(ranked_chunks(searcher, queries), max_pages=MAX_RANK)
+        ]
+
     pages: list[str] = []
     for result in searcher.search(question, mode=mode, top_k=CHUNKS_FETCHED):
         url = result.node.metadata["url"]
@@ -92,7 +128,7 @@ def metrics(ranks: list[int | None]) -> dict[str, float]:
     }
 
 
-def evaluate(golden: GoldenSet, modes: list[Mode], *, query_instruction: bool = False) -> dict:
+def evaluate(golden: GoldenSet, modes: list[EvalMode], *, query_instruction: bool = False) -> dict:
     searcher = Searcher(query_instruction=query_instruction)
     report: dict = {
         "run_at": datetime.now(UTC).isoformat(timespec="seconds"),

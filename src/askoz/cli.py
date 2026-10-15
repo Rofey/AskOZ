@@ -2,7 +2,9 @@
 
 import argparse
 import sys
+from collections.abc import Iterator
 from pathlib import Path
+from typing import Any, cast
 
 import psycopg
 import redis
@@ -76,6 +78,9 @@ def main() -> None:
     evaluate.add_argument("--save-baseline", action="store_true")
     evaluate.add_argument("--check", action="store_true", help="exit 1 if worse than baseline")
     evaluate.add_argument("--show-misses", action="store_true")
+    ask = sub.add_parser("ask", help="answer a question with citations")
+    ask.add_argument("question")
+    ask.add_argument("-v", "--verbose", action="store_true", help="show the query plan")
     args = parser.parse_args()
 
     # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
@@ -126,6 +131,44 @@ def main() -> None:
                 print(f"   {meta['url']}")
     elif args.command == "eval":
         sys.exit(run_eval(args))
+    elif args.command == "ask":
+        run_ask(args.question, verbose=args.verbose)
+
+
+def run_ask(question: str, *, verbose: bool) -> None:
+    import anthropic
+
+    from askoz.answer.graph import build_graph
+
+    final: dict[str, Any] = {}
+    streamed = False
+    stream = build_graph().stream({"question": question}, stream_mode=["custom", "values"])
+    try:
+        for mode, chunk in cast(Iterator[tuple[str, dict[str, Any]]], stream):
+            if mode == "custom":
+                print(chunk["text"], end="", flush=True)
+                streamed = True
+            else:
+                final = chunk
+    except anthropic.APIStatusError as exc:
+        # Short message for the person, full detail (incl. request id) for the logs.
+        log.error("claude_api_error", status=exc.status_code, request_id=exc.request_id)
+        sys.exit(f"Claude API error {exc.status_code}: {exc.message}")
+    except anthropic.APIConnectionError as exc:
+        log.error("claude_api_unreachable", error=str(exc))
+        sys.exit("Couldn't reach the Claude API. Check your internet connection.")
+    if not streamed:
+        print(final.get("answer", ""))
+    if final.get("sources"):
+        print("\n\nSources:")
+        for number, page in enumerate(final["sources"], 1):
+            print(f"[{number}] {page.title}\n    {page.url}")
+    if verbose:
+        plan = final.get("plan")
+        print(f"\nroute: {final.get('route')}")
+        if plan:
+            print(f"search queries: {plan.search_queries}")
+        print(f"pages retrieved: {[p.title for p in final.get('pages', [])]}")
 
 
 def run_eval(args: argparse.Namespace) -> int:
