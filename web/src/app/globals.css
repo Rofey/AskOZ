@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Colour tokens. Deliberately not the Australian Government's green and gold:
+   AskOz must not look official. Text colours meet WCAG AA contrast (4.5:1+). */
+:root {
+  --background: #fbfbf9;
+  --foreground: #1b1f24;
+  --surface: #ffffff;
+  --line: #d9dde3;
+  --muted: #5b6472;
+  --accent: #0f6466;
+  --on-accent: #ffffff;
+  --note-bg: #eef3f7;
+  --note: #2c4a63;
+  --warn-bg: #fdf0ed;
+  --warn: #8a2c17;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121417;
+    --foreground: #e6e8eb;
+    --surface: #1a1d21;
+    --line: #2e333a;
+    --muted: #9aa3ae;
+    --accent: #5fc2c4;
+    --on-accent: #0b2526;
+    --note-bg: #1c2a35;
+    --note: #b8cfe0;
+    --warn-bg: #3a1d16;
+    --warn: #f3b6a5;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-note-bg: var(--note-bg);
+  --color-note: var(--note);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn: var(--warn);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Typography for streamed Markdown answers. */
+.answer {
+  line-height: 1.65;
+}
+.answer > * + * {
+  margin-top: 0.75rem;
+}
+.answer h1,
+.answer h2,
+.answer h3 {
+  font-weight: 600;
+  margin-top: 1.25rem;
+}
+.answer ul,
+.answer ol {
+  padding-left: 1.25rem;
+}
+.answer ul {
+  list-style: disc;
+}
+.answer ol {
+  list-style: decimal;
+}
+.answer li + li {
+  margin-top: 0.25rem;
+}
+.answer a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.answer .citation {
+  text-decoration: none;
+  font-size: 0.75em;
+  font-weight: 600;
+  padding: 0 0.15em;
+  border-radius: 0.25em;
+  background: var(--note-bg);
+}
+.answer .citation:hover,
+.answer .citation:focus-visible {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

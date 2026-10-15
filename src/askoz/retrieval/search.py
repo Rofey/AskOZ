@@ -79,3 +79,6 @@ class Searcher:
 #   No local reranker fixed it; query rewriting (Phase 6) should.
 # - Year-versioned pages: myTax 2024/2025/2026 instructions compete with each
 #   other. Tag chunks with their tax year and prefer the latest.
+# - Chunks per page: answers get the 3 best chunks of each page, so a page's
+#   key table can be left out (e.g. DASP rates for "can I get my super back").
+#   Tune with answer-level evals.
