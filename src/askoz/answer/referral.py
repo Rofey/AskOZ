@@ -7,22 +7,19 @@ answering a question we have no sources for.
 from typing import Any
 
 from askoz.answer.agencies import Agency
-
-COVERAGE_NOTE = (
-    "It currently covers tax, super and related topics from the Australian Taxation Office."
-)
+from askoz.answer.coverage import coverage_note
 
 
 def not_covered_text() -> str:
     # Short on purpose: the "where to go" card (or the CLI's "Where to go" line)
     # names the agency and links to it, so the text doesn't repeat it.
-    return f"**AskOz can't answer this one yet.** {COVERAGE_NOTE}"
+    return f"**AskOz can't answer this one yet.** {coverage_note()}"
 
 
 def nothing_found_text(agency: Agency) -> str:
     return (
         "**AskOz couldn't find official information about this.** "
-        f"{COVERAGE_NOTE} Try rephrasing your question, or find the right service "
+        f"{coverage_note()} Try rephrasing your question, or find the right service "
         f"through {agency.name}."
     )
 

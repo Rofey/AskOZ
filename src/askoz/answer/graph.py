@@ -92,8 +92,8 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
             "referral": agency,
             "answer": not_covered_text(),
         }
-        if query_plan.tax_angle_question:
-            update["suggestion"] = query_plan.tax_angle_question
+        if query_plan.related_question:
+            update["suggestion"] = query_plan.related_question
         return update
 
     def retrieve(state: AskState) -> dict:

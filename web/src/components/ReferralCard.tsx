@@ -42,7 +42,7 @@ export function ReferralCard({
       </ul>
       {referral.suggestion && (
         <p className="mt-4 text-sm">
-          <span className="text-muted">AskOz can help with the tax side: </span>
+          <span className="text-muted">AskOz can help with: </span>
           <button
             type="button"
             onClick={() => onAsk(referral.suggestion!)}

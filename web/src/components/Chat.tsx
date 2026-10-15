@@ -9,13 +9,13 @@ import {
   GradCap,
   HeartPulse,
   LogoMark,
+  Passport,
   PiggyBank,
   Plane,
   Plus,
   Quote,
   Receipt,
   ShieldCheck,
-  Wallet,
 } from "@/components/icons";
 import { PromptBox } from "@/components/PromptBox";
 import { ReferralCard } from "@/components/ReferralCard";
@@ -32,18 +32,18 @@ type Exchange = {
 };
 
 const EXAMPLES = [
+  "Can I work while studying on a student visa?",
   "How much tax do backpackers pay?",
   "Can I get my super back when I leave Australia?",
-  "Do I pay tax on Centrelink payments?",
 ];
 
 const TOPICS = [
+  { icon: Passport, title: "Visas & citizenship", text: "Visitor, student, work and partner visas", prompt: "What visa can I get after I finish studying in Australia?" },
   { icon: Plane, title: "New to Australia", text: "TFNs, residency, working holiday tax", prompt: "How do I get a tax file number if I'm on a visa?" },
   { icon: Receipt, title: "Tax returns", text: "Lodging, refunds, amendments", prompt: "How do I lodge my first tax return?" },
   { icon: PiggyBank, title: "Super", text: "Employer super, access, DASP", prompt: "When can I access my super?" },
   { icon: HeartPulse, title: "Medicare & health cover", text: "Medicare levy and surcharge", prompt: "Do I have to pay the Medicare levy surcharge?" },
   { icon: GradCap, title: "Study loans", text: "HELP repayments and balances", prompt: "How much do I have to repay on my HELP debt?" },
-  { icon: Wallet, title: "Paying the ATO", text: "Payment plans, debts, penalties", prompt: "What can I do if I can't pay my tax bill?" },
 ];
 
 const TRUST = [
@@ -184,8 +184,8 @@ export function Chat() {
               Government info, <span className="text-accent">in plain English</span>
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted text-pretty">
-              Ask about tax, super, Medicare or study loans. Answers come only from official
-              Australian Government websites, with a link to every source.
+              Ask about visas, citizenship, tax, super or Medicare. Answers come only from
+              official Australian Government websites, with a link to every source.
             </p>
             <div className="mt-8 text-left">{prompt("hero")}</div>
             <div className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Example questions">
@@ -240,7 +240,8 @@ export function Chat() {
               AskOz is an independent service, not affiliated with or endorsed by the Australian
               Government. It gives general information only, not financial, tax, legal or migration
               advice. Always check the linked official page, or ask a registered tax agent or the
-              agency. AskOz currently covers Australian Taxation Office pages for individuals.
+              agency. AskOz currently covers the Department of Home Affairs (visas and
+              citizenship) and the Australian Taxation Office (tax and super for individuals).
             </p>
           </section>
         </main>

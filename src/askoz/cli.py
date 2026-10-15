@@ -117,6 +117,7 @@ def main() -> None:
             "ingest_done",
             pages=stats.pages,
             skipped_no_content=stats.skipped_no_content,
+            failed=stats.failed,
             chunks_written=stats.chunks_written,
         )
     elif args.command in ("search", "compare"):

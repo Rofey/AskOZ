@@ -1,37 +1,37 @@
 {
-  "run_at": "2026-10-15T00:23:27+00:00",
+  "run_at": "2026-10-15T04:02:22+00:00",
   "query_instruction": false,
-  "questions": 56,
+  "questions": 73,
   "modes": {
     "vector": {
       "overall": {
-        "hit@1": 0.6428571428571429,
-        "hit@5": 0.8392857142857143,
-        "hit@10": 0.9107142857142857,
-        "mrr": 0.7309736394557823
+        "hit@1": 0.6301369863013698,
+        "hit@5": 0.8356164383561644,
+        "hit@10": 0.9178082191780822,
+        "mrr": 0.721249184605349
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.5,
-          "hit@5": 0.8333333333333334,
-          "hit@10": 0.8333333333333334,
-          "mrr": 0.638888888888889
+          "hit@1": 0.625,
+          "hit@5": 0.875,
+          "hit@10": 0.875,
+          "mrr": 0.7291666666666666
         },
         "official": {
-          "hit@1": 0.7647058823529411,
-          "hit@5": 0.9411764705882353,
+          "hit@1": 0.75,
+          "hit@5": 0.95,
           "hit@10": 1.0,
-          "mrr": 0.8368347338935574
+          "mrr": 0.8363095238095237
         },
         "plain": {
-          "hit@1": 0.6060606060606061,
-          "hit@5": 0.7878787878787878,
-          "hit@10": 0.8787878787878788,
-          "mrr": 0.6931818181818182
+          "hit@1": 0.5777777777777777,
+          "hit@5": 0.7777777777777778,
+          "hit@10": 0.8888888888888888,
+          "mrr": 0.6687037037037037
         }
       },
       "ranks": {
-        "whm-tax-rate": 2,
+        "whm-tax-rate": 1,
         "whm-residency": 1,
         "student-work-tax": 8,
         "newcomer-tax-free-threshold": 3,
@@ -46,7 +46,7 @@
         "tfn-lost": 1,
         "tfn-stolen": 1,
         "tfn-what": 2,
-        "super-back-leaving": 4,
+        "super-back-leaving": 6,
         "dasp-rate": 1,
         "employer-super-amount": 1,
         "super-access-when": 2,
@@ -65,7 +65,7 @@
         "mls-no-insurance": null,
         "mls-cover-level": 1,
         "phi-rebate-thresholds": 1,
-        "lifetime-health-cover": 1,
+        "lifetime-health-cover": 2,
         "need-to-lodge": 1,
         "first-return": 1,
         "free-help": 8,
@@ -82,38 +82,55 @@
         "bpay": 1,
         "late-penalty": 8,
         "gic": 1,
-        "dont-pay": 1,
+        "dont-pay": null,
         "hecs-repayment": null,
         "help-overseas": 3,
         "help-balance": 1,
-        "bushfire": 1
+        "bushfire": 1,
+        "student-visa-work": 1,
+        "visitor-stay": 1,
+        "whv-age": 1,
+        "evisitor-europe": 3,
+        "eta-usa": 1,
+        "transit": 3,
+        "post-study": 1,
+        "skilled-points": 2,
+        "employer-sponsor": 1,
+        "partner-onshore": 1,
+        "bring-parents": 1,
+        "pr-to-citizen": 1,
+        "citizenship-test": 5,
+        "vevo": 1,
+        "visa-expiring": 1,
+        "visa-exploitation": 10,
+        "english-test": 3
       }
     },
     "keyword": {
       "overall": {
-        "hit@1": 0.25,
-        "hit@5": 0.5,
-        "hit@10": 0.5714285714285714,
-        "mrr": 0.35788690476190477
+        "hit@1": 0.2328767123287671,
+        "hit@5": 0.4794520547945205,
+        "hit@10": 0.5753424657534246,
+        "mrr": 0.3523755164166123
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.3333333333333333,
+          "hit@1": 0.25,
           "hit@5": 0.5,
-          "hit@10": 0.5,
-          "mrr": 0.4166666666666667
+          "hit@10": 0.625,
+          "mrr": 0.3888888888888889
         },
         "official": {
-          "hit@1": 0.35294117647058826,
-          "hit@5": 0.5294117647058824,
-          "hit@10": 0.5882352941176471,
-          "mrr": 0.4372549019607843
+          "hit@1": 0.3,
+          "hit@5": 0.5,
+          "hit@10": 0.55,
+          "mrr": 0.39880952380952384
         },
         "plain": {
-          "hit@1": 0.18181818181818182,
-          "hit@5": 0.48484848484848486,
-          "hit@10": 0.5757575757575758,
-          "mrr": 0.3063131313131313
+          "hit@1": 0.2,
+          "hit@5": 0.4666666666666667,
+          "hit@10": 0.5777777777777777,
+          "mrr": 0.32524691358024693
         }
       },
       "ranks": {
@@ -127,8 +144,8 @@
         "moving-overseas-lodge": 2,
         "leaving-lodge-early": 1,
         "foreign-income-offset": null,
-        "tfn-visa-holder": 1,
-        "tfn-citizen": 10,
+        "tfn-visa-holder": 9,
+        "tfn-citizen": null,
         "tfn-lost": 8,
         "tfn-stolen": null,
         "tfn-what": null,
@@ -138,14 +155,14 @@
         "super-access-when": null,
         "super-choose-fund": 2,
         "two-jobs-threshold": 3,
-        "cash-job": 5,
+        "cash-job": 6,
         "employee-or-contractor": 1,
         "redundancy-tax": 2,
         "salary-sacrifice": 1,
         "income-statement": null,
         "not-tax-ready": 1,
         "centrelink-taxable": null,
-        "under-18-income": 4,
+        "under-18-income": 5,
         "medicare-levy-what": 1,
         "no-medicare-levy": null,
         "mls-no-insurance": null,
@@ -172,34 +189,51 @@
         "hecs-repayment": null,
         "help-overseas": null,
         "help-balance": 2,
-        "bushfire": 3
+        "bushfire": 3,
+        "student-visa-work": 9,
+        "visitor-stay": 2,
+        "whv-age": 2,
+        "evisitor-europe": null,
+        "eta-usa": 1,
+        "transit": null,
+        "post-study": 2,
+        "skilled-points": 7,
+        "employer-sponsor": 2,
+        "partner-onshore": null,
+        "bring-parents": null,
+        "pr-to-citizen": 1,
+        "citizenship-test": 1,
+        "vevo": 2,
+        "visa-expiring": null,
+        "visa-exploitation": null,
+        "english-test": 1
       }
     },
     "hybrid": {
       "overall": {
-        "hit@1": 0.48214285714285715,
-        "hit@5": 0.7857142857142857,
-        "hit@10": 0.8928571428571429,
-        "mrr": 0.5910926870748299
+        "hit@1": 0.4931506849315068,
+        "hit@5": 0.7808219178082192,
+        "hit@10": 0.9041095890410958,
+        "mrr": 0.605071754729289
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.5,
-          "hit@5": 0.6666666666666666,
-          "hit@10": 0.8333333333333334,
-          "mrr": 0.5611111111111111
+          "hit@1": 0.625,
+          "hit@5": 0.625,
+          "hit@10": 0.875,
+          "mrr": 0.6666666666666666
         },
         "official": {
-          "hit@1": 0.4117647058823529,
-          "hit@5": 0.8235294117647058,
+          "hit@1": 0.4,
+          "hit@5": 0.85,
           "hit@10": 1.0,
-          "mrr": 0.5686974789915966
+          "mrr": 0.5725595238095238
         },
         "plain": {
-          "hit@1": 0.5151515151515151,
-          "hit@5": 0.7878787878787878,
-          "hit@10": 0.8484848484848485,
-          "mrr": 0.6080808080808081
+          "hit@1": 0.5111111111111111,
+          "hit@5": 0.7777777777777778,
+          "hit@10": 0.8666666666666667,
+          "mrr": 0.6085714285714285
         }
       },
       "ranks": {
@@ -212,12 +246,12 @@
         "pacific-worker-tax": 1,
         "moving-overseas-lodge": 1,
         "leaving-lodge-early": 1,
-        "foreign-income-offset": 6,
+        "foreign-income-offset": 7,
         "tfn-visa-holder": 1,
-        "tfn-citizen": 2,
+        "tfn-citizen": 1,
         "tfn-lost": 1,
         "tfn-stolen": 6,
-        "tfn-what": 4,
+        "tfn-what": 5,
         "super-back-leaving": 2,
         "dasp-rate": 1,
         "employer-super-amount": 1,
@@ -252,44 +286,61 @@
         "lito": 2,
         "cant-pay": 3,
         "bpay": 1,
-        "late-penalty": 5,
+        "late-penalty": 6,
         "gic": 8,
-        "dont-pay": 1,
+        "dont-pay": 5,
         "hecs-repayment": null,
-        "help-overseas": 5,
-        "help-balance": 1,
-        "bushfire": 1
+        "help-overseas": 6,
+        "help-balance": 2,
+        "bushfire": 1,
+        "student-visa-work": 2,
+        "visitor-stay": 1,
+        "whv-age": 2,
+        "evisitor-europe": 7,
+        "eta-usa": 1,
+        "transit": 5,
+        "post-study": 1,
+        "skilled-points": 3,
+        "employer-sponsor": 1,
+        "partner-onshore": 1,
+        "bring-parents": 1,
+        "pr-to-citizen": 1,
+        "citizenship-test": 3,
+        "vevo": 1,
+        "visa-expiring": 1,
+        "visa-exploitation": null,
+        "english-test": 1
       }
     },
     "rerank": {
       "overall": {
-        "hit@1": 0.5,
-        "hit@5": 0.8571428571428571,
-        "hit@10": 0.9107142857142857,
-        "mrr": 0.6398809523809524
+        "hit@1": 0.5342465753424658,
+        "hit@5": 0.8904109589041096,
+        "hit@10": 0.9178082191780822,
+        "mrr": 0.6676940639269406
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.6666666666666666,
-          "hit@5": 0.8333333333333334,
-          "hit@10": 0.8333333333333334,
-          "mrr": 0.7083333333333334
+          "hit@1": 0.625,
+          "hit@5": 0.875,
+          "hit@10": 0.875,
+          "mrr": 0.71875
         },
         "official": {
-          "hit@1": 0.6470588235294118,
-          "hit@5": 0.9411764705882353,
+          "hit@1": 0.65,
+          "hit@5": 0.95,
           "hit@10": 1.0,
-          "mrr": 0.7465686274509804
+          "mrr": 0.7470833333333333
         },
         "plain": {
-          "hit@1": 0.3939393939393939,
-          "hit@5": 0.8181818181818182,
-          "hit@10": 0.8787878787878788,
-          "mrr": 0.5724747474747475
+          "hit@1": 0.4666666666666667,
+          "hit@5": 0.8666666666666667,
+          "hit@10": 0.8888888888888888,
+          "mrr": 0.6233333333333333
         }
       },
       "ranks": {
-        "whm-tax-rate": 8,
+        "whm-tax-rate": 1,
         "whm-residency": 1,
         "student-work-tax": 3,
         "newcomer-tax-free-threshold": 5,
@@ -344,7 +395,24 @@
         "hecs-repayment": null,
         "help-overseas": 4,
         "help-balance": 1,
-        "bushfire": 1
+        "bushfire": 1,
+        "student-visa-work": 1,
+        "visitor-stay": 2,
+        "whv-age": 1,
+        "evisitor-europe": 4,
+        "eta-usa": 1,
+        "transit": 5,
+        "post-study": 1,
+        "skilled-points": 4,
+        "employer-sponsor": 1,
+        "partner-onshore": 1,
+        "bring-parents": 3,
+        "pr-to-citizen": 1,
+        "citizenship-test": 1,
+        "vevo": 2,
+        "visa-expiring": 1,
+        "visa-exploitation": null,
+        "english-test": 1
       }
     }
   }

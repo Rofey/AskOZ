@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # and good enough on our evals (Oct 2026). Switch by env var and re-run evals.
     answer_model: str = "claude-haiku-5-5"
     rewrite_model: str = "claude-haiku-5-5"
+    # Sources that are crawled, indexed and checked: AskOz answers their questions
+    # and refers everything else (see askoz.answer.coverage).
+    live_sources: list[str] = ["ato", "home_affairs"]
 
     # --- Abuse and cost protection (see askoz.safety) ---------------------------
     rate_limit_per_minute: int = 5  # questions per client IP

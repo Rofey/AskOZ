@@ -52,9 +52,17 @@ def group_into_pages(
     chunks: list[NodeWithScore], *, max_pages: int = MAX_PAGES
 ) -> list[SourcePage]:
     pages: dict[str, SourcePage] = {}
+    seen_texts: set[str] = set()
     for result in chunks:
         meta = result.node.metadata
         url = meta["url"]
+        text = result.node.get_content()
+        # Sites repeat boilerplate across pages (e.g. the same "get help with
+        # your application" steps on 40+ visa pages). Take each text once, so
+        # five near-identical pages can't fill every slot Claude sees.
+        if text in seen_texts:
+            continue
+        seen_texts.add(text)
         if url not in pages:
             if len(pages) == max_pages:
                 continue
@@ -63,5 +71,5 @@ def group_into_pages(
             )
         page = pages[url]
         if len(page.sections) < MAX_CHUNKS_PER_PAGE:
-            page.sections.append(result.node.get_content())
+            page.sections.append(text)
     return list(pages.values())

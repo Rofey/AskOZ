@@ -50,14 +50,15 @@ BATCH_SIZE = 50  # documents per pipeline run; bounds memory and gives progress
 # (title, agency, header_path) is prepended to the chunk text before embedding,
 # so "15% tax rate" in a chunk under "Working holiday makers" embeds as being
 # about working holiday makers.
-_NOT_EMBEDDED = ["url", "source", "fetched_at", "last_updated"]
-_NOT_FOR_LLM = ["source", "fetched_at"]
+_NOT_EMBEDDED = ["url", "source", "last_updated"]
+_NOT_FOR_LLM = ["source"]
 
 
 @dataclass
 class IngestStats:
     pages: int = 0
     skipped_no_content: int = 0
+    failed: int = 0
     chunks_written: int = 0
 
 
@@ -80,16 +81,23 @@ def load_documents(
 ) -> Iterator[Document]:
     store = LocalBlobStore(get_settings().blob_dir)
     query = (
-        "SELECT url, source, blob_key, fetched_at FROM raw_pages"
+        "SELECT url, source, blob_key FROM raw_pages"
         " WHERE http_status = 200 AND (%(source)s::text IS NULL OR source = %(source)s)"
         " ORDER BY url LIMIT %(limit)s"
     )
     with connect() as conn:
         rows = conn.execute(query, {"source": source, "limit": limit}).fetchall()
 
-    for url, page_source, blob_key, fetched_at in rows:
+    for url, page_source, blob_key in rows:
         stats.pages += 1
-        page = clean_html(gzip.decompress(store.get(blob_key)))
+        try:
+            page = clean_html(gzip.decompress(store.get(blob_key)), url)
+        except Exception:
+            # One odd page must not stop the whole run (nightly updates would
+            # silently stall). Count it, log it with the URL, move on.
+            stats.failed += 1
+            log.exception("page_clean_failed", url=url)
+            continue
         if page is None:
             stats.skipped_no_content += 1
             log.debug("page_skipped_no_content", url=url)
@@ -103,7 +111,9 @@ def load_documents(
                 "source": page_source,
                 "agency": SOURCES[page_source].agency,
                 "last_updated": page.last_updated.isoformat() if page.last_updated else None,
-                "fetched_at": fetched_at.isoformat(),
+                # No fetch time here: the docstore hashes metadata too, so a
+                # timestamp would make every re-crawled page look changed and
+                # get re-embedded even when its text is identical.
             },
             excluded_embed_metadata_keys=_NOT_EMBEDDED,
             excluded_llm_metadata_keys=_NOT_FOR_LLM,

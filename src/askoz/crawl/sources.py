@@ -25,6 +25,12 @@ class Source:
     start_paths: tuple[str, ...] = ()  # entry points for sites without a sitemap
     min_delay: float = 2.0  # seconds between requests; robots.txt Crawl-delay can raise it
     max_depth: int = 6  # link hops from a start page (link-following sources only)
+    # What questions this source answers, in plain words. Used in the planner's
+    # coverage rules and in "AskOz currently covers ..." messages.
+    covers: str = ""
+    # The referral agency (askoz.answer.agencies) this source replaces once live:
+    # its questions become answerable instead of referred.
+    replaces_referral: str | None = None
 
     def allows(self, url: str) -> bool:
         parts = urlsplit(url)
@@ -57,6 +63,12 @@ SOURCES: dict[str, Source] = {
                 r"^/help-support(/|$)",
             ),
             deny=(r"/Documents/", r"\.(pdf|docx?|xlsx?)$"),
+            covers=(
+                "visas (visitor, student, work, skilled, family and partner visas: "
+                "eligibility, costs, conditions and how to apply), citizenship, and "
+                "travelling to and from Australia"
+            ),
+            replaces_referral="home_affairs",
         ),
         Source(
             name="services_australia",
@@ -66,6 +78,8 @@ SOURCES: dict[str, Source] = {
             allow=(r"^/",),
             deny=(r"^/search(/|$)",),
             min_delay=10.0,  # their robots.txt asks for Crawl-delay: 10
+            covers="Centrelink payments, Medicare enrolment and cards, and Child Support",
+            replaces_referral="services_australia",
         ),
         Source(
             name="ato",
@@ -74,6 +88,12 @@ SOURCES: dict[str, Source] = {
             sitemap_url="https://www.ato.gov.au/sitemap.xml",
             allow=(r"^/individuals-and-families/",),
             deny=(ARCHIVED_YEAR,),
+            covers=(
+                "tax for individuals: income tax, tax returns and refunds, deductions and "
+                "offsets, tax file numbers, tax residency, superannuation, the Medicare "
+                "levy and surcharge, private health insurance rebates on tax returns, "
+                "HELP/study loan repayments, and paying the ATO"
+            ),
         ),
     ]
 }

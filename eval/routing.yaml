@@ -2,6 +2,7 @@
 #
 # expect:   covered | partly | not_covered | out_of_scope
 # refer_to: the agency id for partly / not_covered (any of the listed ids counts)
+# covered_by: a source that, once live, makes this question "covered" instead
 #
 # Questions here must not appear as examples in the planner prompt
 # (src/askoz/answer/rewrite.py), or this eval would only test copying.
@@ -16,8 +17,8 @@ questions:
   - {question: "what is the Medicare levy surcharge", expect: covered}
 
   # Another agency's territory
-  - {question: "how do I apply for a partner visa", expect: not_covered, refer_to: [home_affairs]}
-  - {question: "how long does Australian citizenship take", expect: not_covered, refer_to: [home_affairs]}
+  - {question: "how do I apply for a partner visa", expect: not_covered, refer_to: [home_affairs], covered_by: home_affairs}
+  - {question: "how long does Australian citizenship take", expect: not_covered, refer_to: [home_affairs], covered_by: home_affairs}
   - {question: "how do I renew my passport", expect: not_covered, refer_to: [passports]}
   - {question: "how do I get a Medicare card", expect: not_covered, refer_to: [services_australia]}
   - {question: "am I eligible for JobSeeker", expect: not_covered, refer_to: [services_australia]}

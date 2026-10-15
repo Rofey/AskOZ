@@ -28,6 +28,8 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+    // Only show a scrollbar once the text is taller than the box can grow.
+    el.style.overflowY = el.scrollHeight > 200 ? "auto" : "hidden";
   }, [value]);
 
   const canSend = value.trim().length >= 3 && !busy;
@@ -61,7 +63,7 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
           }}
           maxLength={MAX_QUESTION_CHARS}
           rows={hero ? 2 : 1}
-          placeholder={hero ? "Describe what you need to know…" : "Ask another question…"}
+          placeholder={hero ? "Ask your question…" : "Ask another question…"}
           aria-describedby={`privacy-${size}`}
           className={`flex-1 resize-none bg-transparent px-2 py-1.5 leading-6 text-foreground outline-none placeholder:text-muted ${
             hero ? "text-lg" : "text-base"

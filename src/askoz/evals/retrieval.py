@@ -42,7 +42,21 @@ class GoldenSet(BaseModel):
     questions: list[GoldenQuestion]
 
     def relevant_urls(self, q: GoldenQuestion) -> set[str]:
-        return {self.base_url + path for path in q.relevant}
+        """Patterns for the pages that answer `q`.
+
+        Paths are relative to base_url (the ATO); other agencies use full URLs.
+        A pattern ending in "/*" matches that page and every page under it, for
+        sites that split one topic across a hub and sub-pages (e.g. a visa and
+        its streams). Use it only for clearly bounded sections.
+        """
+        return {p if p.startswith("https://") else self.base_url + p for p in q.relevant}
+
+
+def matches(url: str, pattern: str) -> bool:
+    if pattern.endswith("/*"):
+        section = pattern[:-2]
+        return url == section or url.startswith(section + "/")
+    return url == pattern
 
 
 def load_golden(path: Path = GOLDEN_PATH) -> GoldenSet:
@@ -56,15 +70,21 @@ def validate(golden: GoldenSet) -> list[str]:
     problems += [f"duplicate id: {i}" for i in sorted({i for i in ids if ids.count(i) > 1})]
     with connect() as conn:
         for q in golden.questions:
-            urls = sorted(golden.relevant_urls(q))
-            rows = conn.execute(
-                "SELECT metadata_->>'url', bool_or(text ILIKE %s) FROM data_chunks"
-                " WHERE metadata_->>'url' = ANY(%s) GROUP BY 1",
-                (f"%{q.evidence}%", urls),
-            ).fetchall()
-            found = {url for url, _ in rows}
-            problems += [f"{q.id}: page not in index: {u}" for u in urls if u not in found]
-            if found and not any(has_evidence for _, has_evidence in rows):
+            any_evidence = False
+            for pattern in sorted(golden.relevant_urls(q)):
+                section = pattern.removesuffix("/*")
+                row = conn.execute(
+                    "SELECT count(DISTINCT metadata_->>'url'),"
+                    " coalesce(bool_or(text ILIKE %s), false)"
+                    " FROM data_chunks WHERE metadata_->>'url' = %s"
+                    " OR (%s AND metadata_->>'url' LIKE %s)",
+                    (f"%{q.evidence}%", section, pattern.endswith("/*"), section + "/%"),
+                ).fetchone()
+                pages, has_evidence = row if row else (0, False)
+                if not pages:
+                    problems.append(f"{q.id}: no indexed page matches {pattern}")
+                any_evidence = any_evidence or has_evidence
+            if not any_evidence:
                 problems.append(f"{q.id}: evidence {q.evidence!r} not on any relevant page")
     return problems
 
@@ -115,7 +135,9 @@ def ranked_pages(searcher: Searcher, question: str, mode: EvalMode) -> list[str]
 
 
 def first_relevant_rank(pages: list[str], relevant: set[str]) -> int | None:
-    return next((i for i, url in enumerate(pages, 1) if url in relevant), None)
+    return next(
+        (i for i, url in enumerate(pages, 1) if any(matches(url, p) for p in relevant)), None
+    )
 
 
 def metrics(ranks: list[int | None]) -> dict[str, float]:

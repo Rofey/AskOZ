@@ -95,3 +95,8 @@ export const ExternalLink = (p: IconProps) => (
     <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
   </Svg>
 );
+export const Passport = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6zM9 17h6M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+  </Svg>
+);

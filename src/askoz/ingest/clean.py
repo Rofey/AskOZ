@@ -7,9 +7,12 @@ chunker splits on them, and each chunk remembers which section it came from.
 import contextlib
 from dataclasses import dataclass
 from datetime import date
+from urllib.parse import urlsplit
 
 import lxml.html
 import trafilatura
+
+from askoz.ingest.sites import home_affairs
 
 # Markup that isn't content: empty jump-link anchors (trafilatura drops any
 # heading that starts with a link, so these cost us every ATO <h2>) and
@@ -32,8 +35,17 @@ class CleanPage:
     last_updated: date | None
 
 
-def clean_html(html: bytes) -> CleanPage | None:
+def clean_html(html: bytes, url: str = "") -> CleanPage | None:
     """Return the page's main content as Markdown, or None if it has none."""
+    schema_text, schema_title = "", ""
+    if urlsplit(url).hostname == "immi.homeaffairs.gov.au":
+        schema = home_affairs.page_schema(html.decode("utf-8", errors="replace"))
+        if schema and home_affairs.is_form(schema):
+            return None  # an online form definition, not information
+        if schema:
+            schema_text = home_affairs.schema_to_markdown(schema)
+            schema_title = str(schema.get("title") or "").strip()
+
     tree = lxml.html.fromstring(html)  # bytes in, so the page's own charset is honoured
     for xpath in _NOISE_XPATHS:
         for element in tree.xpath(xpath):
@@ -41,14 +53,20 @@ def clean_html(html: bytes) -> CleanPage | None:
 
     # Read title and metadata before extract(), which prunes the tree as it works.
     metadata = trafilatura.extract_metadata(tree)
-    title = str(tree.xpath("normalize-space(//h1)")) or (metadata.title if metadata else "") or ""
-    body = trafilatura.extract(
+    title = (
+        str(tree.xpath("normalize-space(//h1)"))
+        or schema_title
+        or (metadata.title if metadata else "")
+        or ""
+    )
+    html_body = trafilatura.extract(
         tree,
         output_format="markdown",
         include_tables=True,
         include_links=False,  # link URLs are noise for embeddings; citations use the page URL
         favor_precision=True,  # when unsure, leave it out: boilerplate hurts more than gaps
     )
+    body = "\n\n".join(part for part in (html_body, schema_text) if part)
     if not body or len(body) < MIN_BODY_CHARS or not title:
         return None
 

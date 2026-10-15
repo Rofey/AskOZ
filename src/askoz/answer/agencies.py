@@ -148,7 +148,3 @@ AGENCIES: dict[str, Agency] = {
         ),
     ]
 }
-
-
-def directory_for_prompt() -> str:
-    return "\n".join(f"- {a.id}: {a.name} ({a.covers})" for a in AGENCIES.values())

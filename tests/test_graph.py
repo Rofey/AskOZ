@@ -21,7 +21,7 @@ PLANS = {
         coverage="not_covered",
         refer_to="home_affairs",
         search_queries=["q"],
-        tax_angle_question="Do I need a TFN to work?",
+        related_question="Do I need a TFN to work?",
     ),
     "pension": QueryPlan(
         in_scope=True, coverage="partly", refer_to="services_australia", search_queries=["q"]
@@ -104,3 +104,44 @@ def test_agency_directory_is_complete_and_safe() -> None:
     for agency in AGENCIES.values():
         assert agency.links
         assert all(link.url.startswith("https://") for link in agency.links)
+
+
+def test_coverage_registry_follows_live_sources(monkeypatch: pytest.MonkeyPatch) -> None:
+    from askoz.answer import coverage
+    from askoz.answer.rewrite import normalise_plan
+    from askoz.config import get_settings
+
+    monkeypatch.setenv("ASKOZ_LIVE_SOURCES", '["ato", "home_affairs"]')
+    get_settings.cache_clear()
+    try:
+        assert "Department of Home Affairs" in coverage.coverage_note()
+        assert "home_affairs" not in {a.id for a in coverage.referral_agencies()}
+        # A plan that still refers a now-covered topic gets answered instead.
+        plan = normalise_plan(
+            QueryPlan(
+                in_scope=True,
+                coverage="not_covered",
+                refer_to="home_affairs",
+                search_queries=["partner visa"],
+            ),
+            "how do I apply for a partner visa",
+        )
+        assert (plan.coverage, plan.refer_to) == ("covered", None)
+    finally:
+        get_settings.cache_clear()
+
+
+def test_scam_referrals_never_carry_suggestions() -> None:
+    from askoz.answer.rewrite import normalise_plan
+
+    plan = normalise_plan(
+        QueryPlan(
+            in_scope=True,
+            coverage="not_covered",
+            refer_to="ato_scams",
+            search_queries=["q"],
+            related_question="Do I have to pay a tax debt?",
+        ),
+        "I got a text saying I owe the ATO money",
+    )
+    assert plan.related_question is None

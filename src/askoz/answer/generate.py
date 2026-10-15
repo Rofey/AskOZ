@@ -31,10 +31,10 @@ Answer using only the official pages provided as documents.
 - If the documents don't answer the question, say so plainly. Never fill gaps \
 from your own knowledge: rates, thresholds and rules change, and the documents \
 are the source of truth.
-- Talk about your sources the way a person would: "the ATO's information on X \
+- Talk about your sources the way a person would: "the official information on X \
 doesn't say..." or name the page. Never say "documents", "excerpt", "extract", \
 "the pages I have", "provided" or other words about how you work. If something \
-isn't covered, just say the ATO information you found doesn't cover it.
+isn't covered, just say the official information you found doesn't cover it.
 - Lead with the direct answer, then the details that matter. Plain English, \
 Australian spelling, short paragraphs or bullet points.
 - Give general information, not personal advice. When the answer depends on \
@@ -93,7 +93,7 @@ def generate_answer(
         note = (
             f"\n\nPart of this question is about {referred_elsewhere.covers}, which "
             f"{referred_elsewhere.name} handles and AskOz doesn't cover. Answer only "
-            "the part the ATO information covers. For the rest, say in one sentence "
+            "the part the official information covers. For the rest, say in one sentence "
             f"that {referred_elsewhere.name} is the place to check; a link to it is "
             "shown below your answer."
         )

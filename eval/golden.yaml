@@ -404,3 +404,123 @@ questions:
       - financial-difficulties-and-disasters/natural-disaster-support/overview-of-natural-disaster-support
       - financial-difficulties-and-disasters/natural-disaster-support/recovery-following-natural-disasters/your-home-and-land-after-a-natural-disaster
     evidence: bushfire
+
+  # --- Visas and citizenship (Department of Home Affairs) ----------------------
+  # Full URLs: these pages aren't under base_url.
+  - id: student-visa-work
+    question: can I work while I'm studying in Australia on a student visa
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/*]
+    evidence: work
+
+  - id: visitor-stay
+    question: how long can I stay on a tourist visa
+    style: plain
+    relevant:
+      # Visitor 600 is a hub; its content is on the stream pages.
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600/*
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/evisitor-651
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601
+    evidence: stay
+
+  - id: whv-age
+    question: is there an age limit for the working holiday visa
+    style: official
+    relevant:
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-417/*
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/work-holiday-462/*
+    evidence: age
+
+  - id: evisitor-europe
+    question: do people from Europe need a visa to visit Australia
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/evisitor-651]
+    evidence: passport
+
+  - id: eta-usa
+    question: can Americans get an ETA for Australia
+    style: acronym
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601]
+    evidence: passport
+
+  - id: transit
+    question: do I need a visa if I'm only changing planes in Australia
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/transit-771/*]
+    evidence: transit
+
+  - id: post-study
+    question: what visa can I get after I finish my degree here
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/temporary-graduate-485/*]
+    evidence: graduate
+
+  - id: skilled-points
+    question: how does the points tested skilled visa work
+    style: official
+    relevant:
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-independent-189/*
+    evidence: points
+
+  - id: employer-sponsor
+    question: can my employer sponsor me for a work visa
+    style: plain
+    relevant:
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skills-in-demand-visa-subclass-482/*
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-employer-sponsored-regional-494/*
+      - https://immi.homeaffairs.gov.au/visas/employing-and-sponsoring-someone/sponsoring-workers/*
+    evidence: sponsor
+
+  - id: partner-onshore
+    question: how do I apply for a partner visa while I'm already in Australia
+    style: official
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore/*]
+    evidence: partner
+
+  - id: bring-parents
+    question: can I bring my mum and dad to live in Australia
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/parent-103/*]
+    evidence: parent
+
+  - id: pr-to-citizen
+    question: I'm a permanent resident, how do I become a citizen
+    style: plain
+    relevant:
+      - https://immi.homeaffairs.gov.au/citizenship/become-a-citizen/*
+    evidence: permanent resident
+
+  - id: citizenship-test
+    question: what's on the citizenship test and how do I prepare
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/citizenship/test-and-interview/prepare-for-test]
+    evidence: test
+
+  - id: vevo
+    question: how do I check my visa conditions with VEVO
+    style: acronym
+    relevant:
+      - https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online
+      - https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/overview
+      - https://immi.homeaffairs.gov.au/visas/already-have-a-visa/check-visa-details-and-conditions/check-conditions-online/visa-holders
+    evidence: VEVO
+
+  - id: visa-expiring
+    question: my visa is about to run out, what are my options
+    style: plain
+    relevant:
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/bridging-visa-a-010/*
+      - https://immi.homeaffairs.gov.au/visas/visa-about-to-expire/*
+    evidence: visa
+
+  - id: visa-exploitation
+    question: my boss is underpaying me and threatening my visa, what can I do
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/visas/working-in-australia/work-rights-and-exploitation]
+    evidence: exploit
+
+  - id: english-test
+    question: what English test results do I need for a visa
+    style: plain
+    relevant: [https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/english-language]
+    evidence: English
