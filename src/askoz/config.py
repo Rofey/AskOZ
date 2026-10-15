@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     rewrite_model: str = "claude-haiku-5-5"
     # Sources that are crawled, indexed and checked: AskOz answers their questions
     # and refers everything else (see askoz.answer.coverage).
-    live_sources: list[str] = ["ato", "home_affairs", "study_australia"]
+    live_sources: list[str] = ["ato", "ato_business", "home_affairs", "study_australia"]
 
     # --- Abuse and cost protection (see askoz.safety) ---------------------------
     rate_limit_per_minute: int = 5  # questions per client IP

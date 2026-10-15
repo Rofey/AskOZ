@@ -25,7 +25,8 @@ questions:
   - {question: "what is the minimum wage in Australia", expect: not_covered, refer_to: [fair_work]}
   - {question: "how many days of annual leave do I get", expect: not_covered, refer_to: [fair_work]}
   - {question: "how do I get my NSW driver licence", expect: not_covered, refer_to: [state_government]}
-  - {question: "how do I register for GST for my business", expect: not_covered, refer_to: [ato_business, business_gov]}
+  - {question: "how do I register for GST for my business", expect: not_covered, refer_to: [ato_business, business_gov], covered_by: ato_business}
+  - {question: "do I need an ABN to deliver food for Uber Eats", expect: not_covered, refer_to: [ato_business, business_gov], covered_by: ato_business}
   - {question: "I got a text saying I owe the ATO money, is it a scam?", expect: not_covered, refer_to: [ato_scams]}
 
   # Study Australia (covered once it is live)

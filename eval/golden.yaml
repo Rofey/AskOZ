@@ -587,3 +587,84 @@ questions:
     style: plain
     relevant: [https://www.studyaustralia.gov.au/en/plan-your-move/your-first-week-in-australia]
     evidence: week
+
+  # --- Sole traders, gig work and small business (ATO business section) -----------
+  - id: uber-abn
+    question: do I need an ABN to drive for Uber
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/sharing-economy-and-tax/ride-sourcing/*]
+    evidence: ABN
+
+  - id: rideshare-gst
+    question: do rideshare drivers have to register for GST
+    style: plain
+    relevant:
+      - https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/sharing-economy-and-tax/ride-sourcing/*
+      - https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/registering-for-gst
+    evidence: GST
+
+  - id: gst-threshold
+    question: when do I have to register for GST
+    style: official
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/registering-for-gst]
+    evidence: "75,000"
+
+  - id: bas-due
+    question: when is my BAS due
+    style: acronym
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/business-activity-statements-bas/*]
+    evidence: due
+
+  - id: sole-trader-deductions
+    question: what can I claim as a sole trader
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/income-and-deductions-for-business/*]
+    evidence: deduct
+
+  - id: psi
+    question: what is personal services income
+    style: official
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/personal-services-income/*]
+    evidence: personal services income
+
+  - id: instant-asset
+    question: can I write off a laptop I bought for my business straight away
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/depreciation-and-capital-expenses-and-allowances/simpler-depreciation-for-small-business/*]
+    evidence: write-off
+
+  - id: hire-contractor
+    question: I'm hiring someone for my business, should they be an employee or a contractor
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/hiring-and-paying-your-workers/employee-or-independent-contractor/*]
+    evidence: contractor
+
+  - id: first-employee-tax
+    question: I've hired my first employee, how much tax do I take out of their pay
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/hiring-and-paying-your-workers/payg-withholding/*]
+    evidence: withhold
+
+  - id: airbnb-room
+    question: do I pay tax if I rent out a room on Airbnb
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/sharing-economy-and-tax/renting-out-all-or-part-of-your-home/*]
+    evidence: rent
+
+  - id: payg-instalments
+    question: what are PAYG instalments
+    style: acronym
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/income-deductions-and-concessions/payg-instalments/*]
+    evidence: instalment
+
+  - id: business-records
+    question: what records do I need to keep for my small business
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/record-keeping-for-business/*]
+    evidence: records
+
+  - id: employer-super
+    question: do I have to pay super for my employees
+    style: plain
+    relevant: [https://www.ato.gov.au/businesses-and-organisations/super-for-employers/*]
+    evidence: super

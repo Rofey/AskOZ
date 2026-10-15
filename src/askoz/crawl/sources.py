@@ -107,6 +107,32 @@ SOURCES: dict[str, Source] = {
             ),
         ),
         Source(
+            name="ato_business",
+            agency="Australian Taxation Office",
+            domain="www.ato.gov.au",
+            sitemap_url="https://www.ato.gov.au/sitemap.xml",
+            # For sole traders, gig workers and small employers. Left out: corporate
+            # tax, not-for-profits, international tax, trusts, e-invoicing, excise
+            # and other industry taxes, and the newsrooms (dated announcements that
+            # would be quoted as if current).
+            allow=(
+                r"^/businesses-and-organisations/(starting-registering-or-closing-a-business"
+                r"|preparing-lodging-and-paying|hiring-and-paying-your-workers"
+                r"|super-for-employers|assets-and-property|income-deductions-and-concessions)(/|$)",
+                r"^/businesses-and-organisations/gst-excise-and-indirect-taxes/gst(/|$)",
+            ),
+            # Benchmarks are industry ratio tables: data, not answers.
+            deny=(ARCHIVED_YEAR, r"/small-business-benchmarks(/|$)"),
+            covers=(
+                "tax for sole traders, gig workers and small businesses: ABNs and "
+                "registering or closing a business, GST and BAS, business income and "
+                "deductions, the sharing economy (rideshare, delivery, renting out), "
+                "personal services income, and employer obligations (PAYG withholding "
+                "and super for employees)"
+            ),
+            replaces_referral="ato_business",
+        ),
+        Source(
             name="ato",
             agency="Australian Taxation Office",
             domain="www.ato.gov.au",
@@ -125,5 +151,6 @@ SOURCES: dict[str, Source] = {
 
 
 def source_for_url(url: str) -> Source | None:
-    host = urlsplit(url).hostname
-    return next((s for s in SOURCES.values() if s.domain == host), None)
+    """The source whose scope includes `url`. Several sources can share a domain
+    (the ATO's individuals and business sections), so scope decides, not host."""
+    return next((s for s in SOURCES.values() if s.allows(url)), None)

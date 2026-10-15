@@ -6,7 +6,7 @@ import { AnswerText } from "@/components/AnswerText";
 import {
   ExternalLink,
   EyeOff,
-  GradCap,
+  Briefcase,
   HeartPulse,
   LogoMark,
   Passport,
@@ -47,7 +47,7 @@ const TOPICS = [
   { icon: Receipt, title: "Tax returns", text: "Lodging, refunds, amendments", prompt: "How do I lodge my first tax return?" },
   { icon: PiggyBank, title: "Super", text: "Employer super, access, DASP", prompt: "When can I access my super?" },
   { icon: HeartPulse, title: "Medicare & health cover", text: "Medicare levy and surcharge", prompt: "Do I have to pay the Medicare levy surcharge?" },
-  { icon: GradCap, title: "Study loans", text: "HELP repayments and balances", prompt: "How much do I have to repay on my HELP debt?" },
+  { icon: Briefcase, title: "Gig work & small business", text: "ABN, GST, rideshare, sole traders", prompt: "Do I need an ABN to drive for Uber?" },
 ];
 
 const TRUST = [
@@ -253,7 +253,8 @@ export function Chat() {
               Government. It gives general information only, not financial, tax, legal or migration
               advice. Always check the linked official page, or ask a registered tax agent or the
               agency. AskOz currently covers the Department of Home Affairs (visas and
-              citizenship) and the Australian Taxation Office (tax and super for individuals).
+              citizenship), the Australian Taxation Office (tax and super for individuals,
+              sole traders and small businesses) and Study Australia.
             </p>
           </section>
         </main>

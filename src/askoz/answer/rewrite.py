@@ -44,8 +44,8 @@ services from official web pages.
 
 AskOz currently covers only these topics, from these agencies' websites:
 {coverage_rules()}
-It does not cover any other agency, business tax, ATO scam and identity-theft \
-guidance, or state services.
+It does not cover any other agency or topic, including ATO scam and \
+identity-theft guidance and state services.
 
 The person may have asked earlier questions in this conversation; they appear in \
 <history>, oldest first. Use them only to understand the new question (what \

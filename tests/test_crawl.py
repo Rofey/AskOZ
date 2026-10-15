@@ -64,3 +64,26 @@ def test_blob_store_round_trip_and_rejects_path_escape(tmp_path: Path) -> None:
     assert store.get("raw/a/b.gz") == b"hello"
     with pytest.raises(ValueError):
         store.put("../outside", b"x")
+
+
+def test_shared_domain_sources_are_told_apart_by_scope() -> None:
+    from askoz.crawl.sources import source_for_url
+
+    assert (
+        source_for_url("https://www.ato.gov.au/individuals-and-families/tax-file-number")
+        == SOURCES["ato"]
+    )
+    assert (
+        source_for_url(
+            "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/registering-for-gst"
+        )
+        == SOURCES["ato_business"]
+    )
+    # Out of both scopes: corporate tax, excise, and the newsroom.
+    for path in [
+        "businesses-and-organisations/corporate-tax-measures-and-assurance/x",
+        "businesses-and-organisations/gst-excise-and-indirect-taxes/excise-on-alcohol/x",
+        "businesses-and-organisations/small-business-newsroom/x",
+        "businesses-and-organisations/income-deductions-and-concessions/small-business-benchmarks/x",
+    ]:
+        assert source_for_url(f"https://www.ato.gov.au/{path}") is None

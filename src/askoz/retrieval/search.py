@@ -82,3 +82,9 @@ class Searcher:
 # - Chunks per page: answers get the 3 best chunks of each page, so a page's
 #   key table can be left out (e.g. DASP rates for "can I get my super back").
 #   Tune with answer-level evals.
+# - Perspective: with the ATO business section live, employer-facing pages can
+#   outrank the personal page for employee questions (5 golden questions lost
+#   rank 1, none left the top 5). Answers stayed in the employee's voice except
+#   occasional copied phrasing. Fix if needed: planner tags personal/business
+#   and retrieval softly prefers the matching section (a preference, not a
+#   filter: renting out a room is personal but lives in the business section).

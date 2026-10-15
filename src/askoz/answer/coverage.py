@@ -36,6 +36,8 @@ def coverage_rules() -> str:
 
 def coverage_note() -> str:
     """Plain-English sentence for users: what AskOz currently covers."""
-    agencies = [s.agency for s in live_sources()]
+    # Several sources can belong to one agency (the ATO's individuals and business
+    # sections); name each agency once, in order.
+    agencies = list(dict.fromkeys(s.agency for s in live_sources()))
     named = agencies[0] if len(agencies) == 1 else ", ".join(agencies[:-1]) + " and " + agencies[-1]
     return f"It currently covers official information from the {named}."
