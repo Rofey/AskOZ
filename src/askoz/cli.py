@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+from pathlib import Path
 
 import psycopg
 import redis
@@ -59,7 +60,7 @@ def main() -> None:
     )
     search = sub.add_parser("search", help="search the index")
     search.add_argument("question")
-    search.add_argument("--mode", default="hybrid", help="vector | keyword | hybrid | rerank")
+    search.add_argument("--mode", default="vector", help="vector | keyword | hybrid | rerank")
     search.add_argument("-k", type=int, default=5, help="number of results")
     search.add_argument(
         "--instruct", action="store_true", help="add bge's query instruction prefix"
@@ -68,6 +69,13 @@ def main() -> None:
     compare.add_argument("question")
     compare.add_argument("-k", type=int, default=5)
     compare.add_argument("--instruct", action="store_true")
+    evaluate = sub.add_parser("eval", help="score retrieval against the golden question set")
+    evaluate.add_argument("--modes", default="vector,keyword,hybrid,rerank")
+    evaluate.add_argument("--instruct", action="store_true")
+    evaluate.add_argument("--validate", action="store_true", help="only check the golden set")
+    evaluate.add_argument("--save-baseline", action="store_true")
+    evaluate.add_argument("--check", action="store_true", help="exit 1 if worse than baseline")
+    evaluate.add_argument("--show-misses", action="store_true")
     args = parser.parse_args()
 
     # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
@@ -116,3 +124,57 @@ def main() -> None:
                 section = (meta.get("header_path") or "/").strip("/").split("/")[-1]
                 print(f"{rank}. [{result.score or 0:.3f}] {meta['title']} > {section or '(top)'}")
                 print(f"   {meta['url']}")
+    elif args.command == "eval":
+        sys.exit(run_eval(args))
+
+
+def run_eval(args: argparse.Namespace) -> int:
+    import json
+    from datetime import datetime
+
+    from askoz.evals.retrieval import (
+        BASELINE_PATH,
+        check_against_baseline,
+        evaluate,
+        load_golden,
+        validate,
+    )
+
+    golden = load_golden()
+    problems = validate(golden)
+    for problem in problems:
+        print(f"golden set problem: {problem}")
+    if problems or args.validate:
+        print(f"{len(golden.questions)} questions, {len(problems)} problems")
+        return 1 if problems else 0
+
+    report = evaluate(golden, args.modes.split(","), query_instruction=args.instruct)
+    styles = sorted({q.style for q in golden.questions})
+    print(f"\n{len(golden.questions)} questions | query instruction: {args.instruct}\n")
+    print(f"{'mode':8} {'hit@1':>6} {'hit@5':>6} {'hit@10':>6} {'MRR':>6}   hit@5 by style")
+    for mode, result in report["modes"].items():
+        o = result["overall"]
+        by_style = "  ".join(f"{s} {result['by_style'][s]['hit@5']:.2f}" for s in styles)
+        print(
+            f"{mode:8} {o['hit@1']:6.2f} {o['hit@5']:6.2f} {o['hit@10']:6.2f} {o['mrr']:6.2f}"
+            f"   {by_style}"
+        )
+        if args.show_misses:
+            misses = [f"{qid} ({r or '-'})" for qid, r in result["ranks"].items() if not r or r > 5]
+            print(f"         not in top 5: {', '.join(misses) or 'none'}")
+
+    out_dir = Path("data/eval")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_file = out_dir / f"retrieval-{datetime.now():%Y%m%d-%H%M%S}.json"
+    out_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(f"\nreport: {out_file}")
+
+    if args.save_baseline:
+        BASELINE_PATH.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        print(f"baseline saved: {BASELINE_PATH}")
+    if args.check:
+        regressions = check_against_baseline(report)
+        for regression in regressions:
+            print(f"REGRESSION {regression}")
+        return 1 if regressions else 0
+    return 0

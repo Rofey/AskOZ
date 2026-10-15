@@ -22,6 +22,7 @@ dependencies = [
     # its own metadata excludes. Lift this pin once a fixed release is out.
     "llama-index-storage-docstore-postgres>=0.4,<0.6",
     "fastembed>=0.5",
+    "pyyaml>=6.0",
 ]
 
 [project.scripts]
@@ -33,6 +34,7 @@ dev = [
     "ruff>=0.8",
     "pyright>=1.1.390",
     "pytest>=8.3",
+    "types-pyyaml>=6.0",
 ]
 
 [build-system]

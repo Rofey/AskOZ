@@ -1,0 +1,406 @@
+# Golden question set for retrieval evaluation.
+#
+# Each question lists the pages that answer it (`relevant`, relative to
+# base_url). Retrieval "hits" if any relevant page is in the top k results.
+# `evidence` is a phrase that must appear on at least one relevant page;
+# `askoz eval --validate` checks it, so a wrong label fails loudly instead of
+# quietly skewing the scores.
+#
+# style:
+#   plain     everyday wording that may not match the ATO's ("backpackers")
+#   official  the ATO's own terms ("working holiday maker")
+#   acronym   short forms people search with (TFN, DASP, HECS)
+#
+# Review these as a real user: would you ask it this way? Is the page right?
+
+base_url: https://www.ato.gov.au/individuals-and-families/
+
+questions:
+  # --- Newcomers, visas and residency ---------------------------------------
+  - id: whm-tax-rate
+    question: how much tax do backpackers pay
+    style: plain
+    relevant: [coming-to-australia-or-going-overseas/coming-to-australia/working-holiday-makers]
+    evidence: "15%"
+
+  - id: whm-residency
+    question: I'm on a working holiday visa, am I a resident for tax purposes?
+    style: official
+    relevant:
+      - coming-to-australia-or-going-overseas/coming-to-australia/australian-residency-if-you-re-on-a-working-holiday-or-visit
+      - coming-to-australia-or-going-overseas/coming-to-australia/working-holiday-makers
+    evidence: working holiday
+
+  - id: student-work-tax
+    question: I'm an international student working part time, do I have to pay tax?
+    style: plain
+    relevant: [coming-to-australia-or-going-overseas/coming-to-australia/studying-in-australia]
+    evidence: student
+
+  - id: newcomer-tax-free-threshold
+    question: can I claim the tax-free threshold if I only arrived in Australia this year
+    style: official
+    relevant: [coming-to-australia-or-going-overseas/coming-to-australia/tax-free-threshold-for-newcomers-to-australia]
+    evidence: tax-free threshold
+
+  - id: residency-183-days
+    question: what is the 183 day rule for tax residency
+    style: official
+    relevant: [coming-to-australia-or-going-overseas/residency-tests/residency-the-183-day-test]
+    evidence: "183"
+
+  - id: am-i-resident
+    question: how do I know if I count as an Australian resident for tax
+    style: plain
+    relevant:
+      - coming-to-australia-or-going-overseas/your-tax-residency
+      - coming-to-australia-or-going-overseas/your-tax-residency/australian-resident-for-tax-purposes
+      - coming-to-australia-or-going-overseas/residency-tests/residency-the-resides-test
+    evidence: resident
+
+  - id: pacific-worker-tax
+    question: tax for workers on the Pacific labour scheme
+    style: official
+    relevant:
+      - coming-to-australia-or-going-overseas/coming-to-australia/pacific-australia-labour-mobility-scheme
+      - coming-to-australia-or-going-overseas/coming-to-australia/seasonal-worker-programme-and-pacific-labour-scheme
+    evidence: Pacific
+
+  - id: moving-overseas-lodge
+    question: I'm moving overseas, do I still need to do an Australian tax return?
+    style: plain
+    relevant:
+      - coming-to-australia-or-going-overseas/living-overseas-and-becoming-a-foreign-tax-resident
+      - coming-to-australia-or-going-overseas/living-overseas-and-remaining-an-australian-tax-resident
+      - your-tax-return/how-to-lodge-your-tax-return/lodge-your-tax-return-from-outside-australia
+    evidence: overseas
+
+  - id: leaving-lodge-early
+    question: I'm leaving Australia for good, can I lodge my tax return before I go?
+    style: plain
+    relevant: [your-tax-return/how-to-lodge-your-tax-return/lodge-your-tax-return-before-leaving-australia]
+    evidence: leaving Australia
+
+  - id: foreign-income-offset
+    question: I paid tax overseas on my foreign income, do I pay tax on it again here?
+    style: plain
+    relevant: [income-deductions-offsets-and-records/tax-offsets/claiming-a-foreign-income-tax-offset]
+    evidence: foreign income tax offset
+
+  # --- Tax file numbers ------------------------------------------------------
+  - id: tfn-visa-holder
+    question: how do I get a TFN if I'm in Australia on a visa
+    style: acronym
+    relevant: [tax-file-number/apply-for-a-tfn/foreign-passport-holders-permanent-migrants-and-temporary-visitors-tfn-application]
+    evidence: visa
+
+  - id: tfn-citizen
+    question: how do I apply for a tax file number as an Australian citizen
+    style: official
+    relevant: [tax-file-number/apply-for-a-tfn/australian-residents-tfn-application]
+    evidence: tax file number
+
+  - id: tfn-lost
+    question: I forgot my tax file number, how do I find it
+    style: plain
+    relevant: [tax-file-number/lost-or-stolen-tfn]
+    evidence: TFN
+
+  - id: tfn-stolen
+    question: someone stole my TFN, what should I do?
+    style: acronym
+    relevant: [tax-file-number/lost-or-stolen-tfn]
+    evidence: stolen
+
+  - id: tfn-what
+    question: what is a tax file number and do I need one to work
+    style: official
+    relevant: [tax-file-number/what-is-a-tax-file-number]
+    evidence: tax file number
+
+  # --- Super -----------------------------------------------------------------
+  - id: super-back-leaving
+    question: can I get my super back when I leave Australia permanently
+    style: plain
+    relevant:
+      - super-for-individuals-and-families/super/temporary-residents-and-superannuation/departing-australia-superannuation-payment-dasp
+      - super-for-individuals-and-families/super/temporary-residents-and-superannuation/how-superannuation-applies-to-temporary-residents
+    evidence: departing Australia superannuation payment
+
+  - id: dasp-rate
+    question: what is the DASP tax rate
+    style: acronym
+    relevant: [super-for-individuals-and-families/super/temporary-residents-and-superannuation/departing-australia-superannuation-payment-dasp]
+    evidence: DASP
+
+  - id: employer-super-amount
+    question: how much super does my boss have to pay me
+    style: plain
+    relevant: [super-for-individuals-and-families/super/growing-and-keeping-track-of-your-super/super-from-your-employer]
+    evidence: super guarantee
+
+  - id: super-access-when
+    question: when am I allowed to take money out of my super
+    style: plain
+    relevant:
+      - super-for-individuals-and-families/super/withdrawing-and-using-your-super/super-withdrawal-options
+      - jobs-and-employment-types/working-as-an-employee/leaving-the-workforce/accessing-your-super-to-retire
+    evidence: preservation age
+
+  - id: super-choose-fund
+    question: how do I pick a super fund
+    style: plain
+    relevant: [super-for-individuals-and-families/super/choosing-a-super-fund]
+    evidence: super fund
+
+  # --- Jobs and income -------------------------------------------------------
+  - id: two-jobs-threshold
+    question: I have two jobs, which one do I claim the tax free threshold on
+    style: plain
+    relevant: [jobs-and-employment-types/tax-free-threshold/multiple-jobs-or-change-of-job]
+    evidence: tax-free threshold
+
+  - id: cash-job
+    question: I got paid cash for some work, do I need to declare it?
+    style: plain
+    relevant: [jobs-and-employment-types/working-as-an-employee/receiving-cash-for-work-you-do]
+    evidence: cash
+
+  - id: employee-or-contractor
+    question: am I an employee or a contractor
+    style: plain
+    relevant: [jobs-and-employment-types/employee-or-independent-contractor-what-s-the-difference]
+    evidence: contractor
+
+  - id: redundancy-tax
+    question: is my redundancy payout taxed
+    style: plain
+    relevant:
+      - jobs-and-employment-types/working-as-an-employee/leaving-your-job/genuine-redundancy-payments
+      - jobs-and-employment-types/working-as-an-employee/leaving-your-job/employment-termination-payments-for-employees
+    evidence: redundancy
+
+  - id: salary-sacrifice
+    question: what is salary sacrificing
+    style: official
+    relevant: [jobs-and-employment-types/working-as-an-employee/salary-sacrificing-for-employees]
+    evidence: salary sacrific
+
+  - id: income-statement
+    question: where do I find my payslip summary for the year, my old payment summary
+    style: plain
+    relevant:
+      - jobs-and-employment-types/working-as-an-employee/income-statements/access-your-income-statement
+      - jobs-and-employment-types/working-as-an-employee/income-statements/lost-or-missing-payment-summary
+    evidence: income statement
+
+  - id: not-tax-ready
+    question: my income statement says not tax ready, what does that mean
+    style: official
+    relevant: [jobs-and-employment-types/working-as-an-employee/income-statements/income-statement-not-tax-ready]
+    evidence: tax ready
+
+  - id: centrelink-taxable
+    question: do I pay tax on Centrelink payments
+    style: plain
+    relevant: [income-deductions-offsets-and-records/income-you-must-declare/government-payments-and-allowances]
+    evidence: government payments
+
+  - id: under-18-income
+    question: how is my income taxed if I'm under 18
+    style: plain
+    relevant: [income-deductions-offsets-and-records/income-you-must-declare/your-income-if-you-are-under-18-years-old]
+    evidence: under 18
+
+  # --- Medicare and health insurance ----------------------------------------
+  - id: medicare-levy-what
+    question: what is the Medicare levy
+    style: official
+    relevant: [medicare-and-private-health-insurance/medicare-levy/what-is-the-medicare-levy]
+    evidence: "2%"
+
+  - id: no-medicare-levy
+    question: I'm not eligible for Medicare, do I still pay the Medicare levy?
+    style: official
+    relevant:
+      - medicare-and-private-health-insurance/medicare-levy/medicare-levy-exemption/not-entitled-to-medicare-benefits
+      - medicare-and-private-health-insurance/medicare-levy/medicare-levy-exemption/foreign-residents-exemption-from-medicare-levy
+    evidence: exemption
+
+  - id: mls-no-insurance
+    question: do I have to pay extra tax if I don't have private health insurance
+    style: plain
+    relevant:
+      - medicare-and-private-health-insurance/medicare-levy-surcharge/paying-the-medicare-levy-surcharge
+      - medicare-and-private-health-insurance/medicare-levy-surcharge/medicare-levy-surcharge-and-your-tax-return
+    evidence: surcharge
+
+  - id: mls-cover-level
+    question: what kind of hospital cover do I need to avoid the Medicare levy surcharge
+    style: official
+    relevant: [medicare-and-private-health-insurance/medicare-levy-surcharge/paying-the-medicare-levy-surcharge/appropriate-level-of-private-patient-hospital-cover]
+    evidence: hospital cover
+
+  - id: phi-rebate-thresholds
+    question: private health insurance rebate income thresholds
+    style: official
+    relevant: [medicare-and-private-health-insurance/private-health-insurance-rebate/income-thresholds-and-rates-for-the-private-health-insurance-rebate]
+    evidence: threshold
+
+  - id: lifetime-health-cover
+    question: why is my health insurance more expensive because I joined late
+    style: plain
+    relevant: [medicare-and-private-health-insurance/private-health-insurance-rebate/lifetime-health-cover]
+    evidence: Lifetime health cover
+
+  # --- Lodging, refunds and assessments ---------------------------------------
+  - id: need-to-lodge
+    question: do I need to lodge a tax return if I earned very little
+    style: plain
+    relevant:
+      - your-tax-return/before-you-prepare-your-tax-return/how-to-work-out-if-you-need-to-lodge-a-tax-return
+      - your-tax-return/how-to-lodge-your-tax-return/lodge-a-non-lodgment-advice
+    evidence: lodge
+
+  - id: first-return
+    question: it's my first time doing a tax return, how do I start
+    style: plain
+    relevant: [your-tax-return/how-to-lodge-your-tax-return/lodging-your-first-tax-return]
+    evidence: first tax return
+
+  - id: free-help
+    question: where can I get free help doing my taxes
+    style: plain
+    relevant:
+      - your-tax-return/help-and-support-to-lodge-your-tax-return/tax-help-program
+      - financial-difficulties-and-disasters/tax-support-for-individuals-businesses-not-for-profits-and-tax-professionals/national-tax-clinic-program
+    evidence: free
+
+  - id: where-refund
+    question: where is my tax refund, it's been weeks
+    style: plain
+    relevant:
+      - your-tax-return/check-the-progress-of-your-tax-return/how-to-track-the-progress-of-your-tax-return
+      - your-tax-return/check-the-progress-of-your-tax-return/status-of-your-tax-return
+      - your-tax-return/check-the-progress-of-your-tax-return/missing-tax-return-refunds
+    evidence: refund
+
+  - id: fix-mistake
+    question: I made a mistake on my tax return, how do I fix it
+    style: plain
+    relevant:
+      - your-tax-return/amend-your-tax-return/how-to-request-an-amendment-to-your-tax-return
+      - your-tax-return/amend-your-tax-return/before-you-amend-your-tax-return
+    evidence: amend
+
+  - id: amend-time-limit
+    question: how long do I have to amend my tax return
+    style: official
+    relevant: [your-tax-return/amend-your-tax-return/time-limits-on-amendments]
+    evidence: years
+
+  - id: unexpected-bill
+    question: why do I owe the ATO money after my tax return
+    style: plain
+    relevant: [your-tax-return/your-notice-of-assessment/why-you-may-receive-a-tax-bill]
+    evidence: tax bill
+
+  - id: disagree-decision
+    question: I disagree with an ATO decision, what can I do
+    style: official
+    relevant: [your-tax-return/if-you-disagree-with-an-ato-decision/which-dispute-or-objection-option-is-right-for-you]
+    evidence: objection
+
+  # --- Deductions and offsets ---------------------------------------------------
+  - id: tax-agent-deduction
+    question: can I claim what I paid my tax agent
+    style: plain
+    relevant: [income-deductions-offsets-and-records/deductions-you-can-claim/cost-of-managing-tax-affairs]
+    evidence: tax agent
+
+  - id: donations
+    question: are charity donations tax deductible
+    style: plain
+    relevant: [income-deductions-offsets-and-records/deductions-you-can-claim/gifts-and-donations]
+    evidence: deductible gift recipient
+
+  - id: records-to-keep
+    question: what receipts do I need to keep for my deductions
+    style: plain
+    relevant:
+      - income-deductions-offsets-and-records/records-you-need-to-keep/documents-to-support-and-verify-your-claims
+      - income-deductions-offsets-and-records/deductions-you-can-claim/claiming-deductions
+      # Year-specific myTax page; also answers it. Re-check when year handling changes.
+      - your-tax-return/instructions-to-complete-your-tax-return/mytax-instructions/2026/deductions/claiming-deductions
+    evidence: records
+
+  - id: lito
+    question: how much is the low income tax offset
+    style: official
+    relevant: [income-deductions-offsets-and-records/tax-offsets/low-income-tax-offset]
+    evidence: low income tax offset
+
+  # --- Paying the ATO -----------------------------------------------------------
+  - id: cant-pay
+    question: I can't afford to pay my tax bill
+    style: plain
+    relevant:
+      - paying-the-ato/help-with-paying/payment-plans
+      - paying-the-ato/help-with-paying/payment-plans/setting-up-a-payment-plan
+      - financial-difficulties-and-disasters/personal-crisis-or-financial-hardship
+    evidence: payment plan
+
+  - id: bpay
+    question: how do I pay the ATO with BPAY
+    style: acronym
+    relevant: [paying-the-ato/how-to-pay/pay-with-bpay]
+    evidence: BPAY
+
+  - id: late-penalty
+    question: is there a fine for lodging my tax return late
+    style: plain
+    relevant: [paying-the-ato/interest-and-penalties/penalties/failure-to-lodge-on-time-penalty]
+    evidence: penalty
+
+  - id: gic
+    question: what is the general interest charge
+    style: official
+    relevant: [paying-the-ato/interest-and-penalties/interest-we-charge/general-interest-charge]
+    evidence: general interest charge
+
+  - id: dont-pay
+    question: what happens if I just don't pay my tax debt
+    style: plain
+    relevant:
+      - paying-the-ato/if-you-don-t-pay
+      - paying-the-ato/if-you-don-t-pay/firmer-action-we-may-take
+      - paying-the-ato/if-you-don-t-pay/legal-action-we-may-take
+    evidence: debt
+
+  # --- Study loans and disasters ------------------------------------------------
+  - id: hecs-repayment
+    question: how much HECS do I have to repay each year
+    style: acronym
+    relevant: [study-and-training-support-loans/compulsory-repayments]
+    evidence: repayment
+
+  - id: help-overseas
+    question: do I still have to repay my HELP debt if I move overseas
+    style: acronym
+    relevant: [study-and-training-support-loans/overseas-repayments]
+    evidence: overseas
+
+  - id: help-balance
+    question: how can I check my study loan balance
+    style: official
+    relevant: [study-and-training-support-loans/view-your-study-loan-account-online]
+    evidence: balance
+
+  - id: bushfire
+    question: my house was damaged in a bushfire, can the ATO help
+    style: plain
+    relevant:
+      - financial-difficulties-and-disasters/natural-disaster-support/overview-of-natural-disaster-support/bushfire-support
+      - financial-difficulties-and-disasters/natural-disaster-support/overview-of-natural-disaster-support
+      - financial-difficulties-and-disasters/natural-disaster-support/recovery-following-natural-disasters/your-home-and-land-after-a-natural-disaster
+    evidence: bushfire

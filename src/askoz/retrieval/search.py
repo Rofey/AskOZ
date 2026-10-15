@@ -1,8 +1,8 @@
 """Search the index four ways, so their behaviour can be compared and measured.
 
-vector   embeddings only: matches meaning, misses exact terms ("WHM", "417")
+vector   embeddings only: matches meaning, misses exact terms (the default)
 keyword  Postgres full-text: matches exact terms, misses paraphrases
-hybrid   both, merged with Reciprocal Rank Fusion (the default)
+hybrid   both, merged with Reciprocal Rank Fusion
 rerank   hybrid candidates re-scored by a cross-encoder
 """
 
@@ -51,7 +51,7 @@ class Searcher:
         return retriever.retrieve(self._query(question))
 
     def search(
-        self, question: str, *, mode: Mode = "hybrid", top_k: int = 5
+        self, question: str, *, mode: Mode = "vector", top_k: int = 5
     ) -> list[NodeWithScore]:
         if mode == "vector":
             return self._retrieve(self._vector, question)[:top_k]
@@ -70,7 +70,11 @@ class Searcher:
         return self._reranker.postprocess_nodes(fused[:CANDIDATES], self._query(question))
 
 
-# Known issues found while comparing modes on real questions (to fix with evals):
+# Mode choice is driven by `askoz eval` (see eval/baseline.json). On the first
+# golden set, vector beat hybrid: keyword search is weak on this corpus and
+# fusing it in added noise. Re-run the eval before changing the default.
+#
+# Known issues found while comparing modes on real questions:
 # - Vocabulary mismatch: "backpackers" vs the ATO's "working holiday makers".
 #   No local reranker fixed it; query rewriting (Phase 6) should.
 # - Year-versioned pages: myTax 2024/2025/2026 instructions compete with each

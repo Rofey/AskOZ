@@ -23,6 +23,19 @@ uv run ruff format && uv run ruff check && uv run pyright && uv run pytest
 uv run pytest -m integration   # needs docker compose services running
 ```
 
+## Retrieval quality
+
+`eval/golden.yaml` holds real-world questions with the pages that answer them.
+Before merging any change to crawling, cleaning, chunking, embeddings or search:
+
+```bash
+uv run askoz eval --check        # fails if hit@5 drops versus eval/baseline.json
+```
+
+If a change is an improvement, update the baseline in the same commit with
+`uv run askoz eval --save-baseline`. (This runs locally for now: it needs the
+search index, which CI doesn't have yet.)
+
 ## About AskOzBot (for website operators)
 
 If you've seen `AskOzBot` in your server logs: it's the crawler for this project.
