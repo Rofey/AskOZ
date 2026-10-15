@@ -14,6 +14,7 @@ cp .env.example .env
 docker compose up -d
 uv sync
 uv run askoz doctor
+git config core.hooksPath .githooks   # run CI's checks before every commit
 ```
 
 ## Checks

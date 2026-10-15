@@ -25,6 +25,8 @@ dependencies = [
     "pyyaml>=6.0",
     "anthropic>=1.0",
     "langgraph>=0.6",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
 ]
 
 [project.scripts]
@@ -37,6 +39,7 @@ dev = [
     "pyright>=1.1.390",
     "pytest>=8.3",
     "types-pyyaml>=6.0",
+    "fakeredis[lua]>=2.26",
 ]
 
 [build-system]

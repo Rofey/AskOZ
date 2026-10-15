@@ -1,0 +1,10 @@
+#!/bin/sh
+# Runs the same checks as CI (.github/workflows/ci.yml) before every commit,
+# so a broken commit is caught here instead of after it's pushed.
+# Enable once per clone:  git config core.hooksPath .githooks
+set -e
+echo "pre-commit: format, lint, types, tests"
+uv run ruff format --check
+uv run ruff check
+uv run pyright
+PYTHONUTF8=1 uv run pytest -q

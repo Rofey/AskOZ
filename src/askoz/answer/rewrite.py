@@ -7,6 +7,9 @@ questions every search mode missed for this reason). A small LLM call that
 rewrites the question into official terminology fixes most of them.
 """
 
+from collections.abc import Callable
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from askoz.answer.llm import client, fallback_options
@@ -41,7 +44,10 @@ class QueryPlan(BaseModel):
     search_queries: list[str] = Field(description="1 to 3 queries in official terminology")
 
 
-def plan_queries(question: str) -> QueryPlan:
+UsageCallback = Callable[[str, Any], None]
+
+
+def plan_queries(question: str, on_usage: UsageCallback | None = None) -> QueryPlan:
     model = get_settings().rewrite_model
     response = client().beta.messages.parse(
         model=model,
@@ -52,6 +58,8 @@ def plan_queries(question: str) -> QueryPlan:
         output_config={"effort": "low"},
         **fallback_options(model),
     )
+    if on_usage:
+        on_usage(model, response.usage)
     plan = response.parsed_output
     if response.stop_reason == "refusal" or plan is None:
         # Don't fail the whole request: searching with the original wording is

@@ -22,11 +22,13 @@ def _run(question: str) -> dict[str, Any]:
 def stubs(monkeypatch: pytest.MonkeyPatch) -> dict[str, list[str]]:
     calls: dict[str, list[str]] = {"plan": [], "generate": []}
 
-    def plan(question: str) -> QueryPlan:
+    def plan(question: str, on_usage: Any = None) -> QueryPlan:
         calls["plan"].append(question)
         return QueryPlan(in_scope="recipe" not in question, search_queries=["official terms"])
 
-    def generate(question: str, pages: list[SourcePage], on_text: Any = None) -> Answer:
+    def generate(
+        question: str, pages: list[SourcePage], on_text: Any = None, on_usage: Any = None
+    ) -> Answer:
         calls["generate"].append(question)
         return Answer(text="answer [1]", sources=pages)
 

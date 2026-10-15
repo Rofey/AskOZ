@@ -41,6 +41,24 @@ class Settings(BaseSettings):
     answer_model: str = "claude-opus-5-5"
     rewrite_model: str = "claude-opus-5-5"
 
+    # --- Abuse and cost protection (see askoz.safety) ---------------------------
+    rate_limit_per_minute: int = 5  # questions per client IP
+    rate_limit_per_day: int = 30
+    # Hard daily ceiling on Claude spend, in USD, measured from real token usage.
+    # Past it, AskOz answers "busy" instead of calling Claude.
+    daily_spend_cap_usd: float = 10.0
+    max_concurrent_answers: int = 8  # Claude calls in flight across the server
+    max_question_chars: int = 500
+    answer_cache_ttl_seconds: int = 2 * 3600
+    # Client IPs are hashed with this secret before they touch Redis or logs, so
+    # we never store raw IP addresses. Required in prod.
+    ip_hash_secret: SecretStr = SecretStr("dev-only-not-secret")
+    # Only trust CF-Connecting-IP / X-Forwarded-For when a proxy we control
+    # (Cloudflare, Fly.io) sets them. Otherwise anyone could fake their IP and
+    # dodge the rate limits.
+    trust_proxy_headers: bool = False
+    cors_origins: list[str] = ["http://localhost:3000"]
+
     @field_validator("crawl_contact_url", "crawl_contact_email")
     @classmethod
     def _empty_means_unset(cls, value: str | None) -> str | None:
@@ -63,11 +81,9 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _require_secrets_in_prod(self) -> "Settings":
         if self.env == "prod":
-            missing = [
-                name
-                for name in ("voyage_api_key", "anthropic_api_key")
-                if getattr(self, name) is None
-            ]
+            missing = [name for name in ("anthropic_api_key",) if getattr(self, name) is None]
+            if self.ip_hash_secret.get_secret_value() == "dev-only-not-secret":
+                missing.append("ip_hash_secret")
             if missing:
                 raise ValueError(f"missing required settings in prod: {', '.join(missing)}")
         return self

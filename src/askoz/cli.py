@@ -78,6 +78,9 @@ def main() -> None:
     evaluate.add_argument("--save-baseline", action="store_true")
     evaluate.add_argument("--check", action="store_true", help="exit 1 if worse than baseline")
     evaluate.add_argument("--show-misses", action="store_true")
+    serve = sub.add_parser("serve", help="run the HTTP API")
+    serve.add_argument("--host", default="127.0.0.1")
+    serve.add_argument("--port", type=int, default=8000)
     ask = sub.add_parser("ask", help="answer a question with citations")
     ask.add_argument("question")
     ask.add_argument("-v", "--verbose", action="store_true", help="show the query plan")
@@ -133,6 +136,20 @@ def main() -> None:
         sys.exit(run_eval(args))
     elif args.command == "ask":
         run_ask(args.question, verbose=args.verbose)
+    elif args.command == "serve":
+        import uvicorn
+
+        uvicorn.run(
+            "askoz.api.app:create_app",
+            factory=True,
+            host=args.host,
+            port=args.port,
+            # Uvicorn would otherwise rewrite the client IP from X-Forwarded-For for
+            # local connections, before our code sees it, letting forged headers
+            # dodge the rate limits. askoz.api.app.client_ip() is the one place
+            # that decides which proxy headers to trust.
+            proxy_headers=False,
+        )
 
 
 def run_ask(question: str, *, verbose: bool) -> None:
