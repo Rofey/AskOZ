@@ -27,9 +27,13 @@ type Exchange = {
   answer: string;
   sources: Source[];
   referral?: Referral;
+  options?: string[]; // when ambiguous: specific questions to choose from
+  route?: string; // how the API handled it (answered, referral, clarify, ...)
   status: "streaming" | "done" | "error" | "stopped";
   error?: string;
 };
+
+const CONTEXT_ROUTES = new Set(["answered", "referral", "nothing_found"]);
 
 const EXAMPLES = [
   "Can I work while studying on a student visa?",
@@ -99,24 +103,32 @@ export function Chat() {
     setFollowing(true);
   }
 
-  async function submit() {
-    const question = draft.trim();
+  // Earlier questions that were actually answered give context to follow-ups
+  // ("can I extend it?"). Blocked, off-topic and "which did you mean?" turns don't.
+  const history = exchanges
+    .filter((e) => e.status === "done" && e.route && CONTEXT_ROUTES.has(e.route))
+    .map((e) => e.question);
+
+  async function submit(text?: string) {
+    const question = (text ?? draft).trim();
     if (question.length < 3 || busy) return;
     const id = crypto.randomUUID();
     const controller = new AbortController();
     abortRef.current = controller;
-    setDraft("");
+    if (text === undefined) setDraft("");
     setFollowing(true);
     setExchanges((all) => [...all, { id, question, answer: "", sources: [], status: "streaming" }]);
 
     try {
       await ask(
         question,
+        history,
         {
           onText: (text) => update(id, (e) => ({ answer: e.answer + text })),
           onReferral: (referral) => update(id, () => ({ referral })),
+          onClarify: (options) => update(id, () => ({ options })),
           onSources: (sources) => update(id, () => ({ sources })),
-          onDone: () => update(id, () => ({ status: "done" })),
+          onDone: ({ route }) => update(id, () => ({ status: "done", route })),
         },
         controller.signal,
       );
@@ -139,7 +151,7 @@ export function Chat() {
       size={size}
       value={draft}
       onChange={setDraft}
-      onSubmit={submit}
+      onSubmit={() => submit()}
       onStop={() => abortRef.current?.abort()}
       busy={busy}
     />
@@ -275,6 +287,22 @@ export function Chat() {
                           </p>
                         )}
                         {e.status === "stopped" && <p className="mt-2 text-sm text-muted">Stopped.</p>}
+                        {e.options && e.options.length > 0 && (
+                          <ul className="mt-3 flex flex-col gap-2" aria-label="Choose what you mean">
+                            {e.options.map((option) => (
+                              <li key={option}>
+                                <button
+                                  type="button"
+                                  disabled={busy}
+                                  onClick={() => submit(option)}
+                                  className="w-full rounded-xl border border-line px-4 py-2.5 text-left text-sm transition hover:border-accent hover:text-accent disabled:opacity-50"
+                                >
+                                  {option}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                         {e.referral && <ReferralCard referral={e.referral} onAsk={fillPrompt} />}
                         {e.sources.length > 0 && (
                           <section aria-label="Sources" className="mt-5">

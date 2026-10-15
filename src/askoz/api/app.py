@@ -20,7 +20,7 @@ import time
 import uuid
 from collections.abc import Iterator
 from contextlib import asynccontextmanager
-from typing import Any, Protocol, cast
+from typing import Annotated, Any, Protocol, cast
 
 import anthropic
 import redis
@@ -131,6 +131,10 @@ def create_app(
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST"],
         allow_headers=["content-type"],
+        # Browsers hide response headers from cross-origin JavaScript unless
+        # they're exposed here. Without this the web app can't read how long
+        # to wait after a 429 and would guess.
+        expose_headers=["Retry-After"],
     )
 
     @app.middleware("http")
@@ -143,6 +147,11 @@ def create_app(
 
     class AskRequest(BaseModel):
         question: str = Field(min_length=3, max_length=settings.max_question_chars)
+        # Up to 3 earlier questions from this conversation (kept only in the
+        # browser), so follow-ups like "can I extend it?" make sense.
+        history: list[Annotated[str, Field(max_length=settings.max_question_chars)]] = Field(
+            default_factory=list, max_length=3
+        )
 
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
@@ -169,7 +178,10 @@ def create_app(
                 headers={"Retry-After": str(decision.retry_after_seconds)},
             )
 
-        if cached := cache.get(body.question):
+        # With history, the same words can mean different things ("my
+        # assessment" after visa vs tax questions), so only standalone
+        # questions use the cache.
+        if not body.history and (cached := cache.get(body.question)):
             log.info("answer_served", request_id=request_id, cached=True, cost_usd=0.0)
             return StreamingResponse(_replay(cached), media_type="text/event-stream")
 
@@ -184,7 +196,7 @@ def create_app(
 
         lease = SlotLease(slots)
         return StreamingResponse(
-            _answer(body.question, request_id, lease),
+            _answer(body.question, body.history, request_id, lease),
             media_type="text/event-stream",
             background=BackgroundTask(lease.release),
         )
@@ -196,7 +208,9 @@ def create_app(
         yield _sse("sources", cached["sources"])
         yield _sse("done", {"route": cached.get("route", "answered"), "cached": True})
 
-    def _answer(question: str, request_id: str, lease: SlotLease) -> Iterator[str]:
+    def _answer(
+        question: str, history: list[str], request_id: str, lease: SlotLease
+    ) -> Iterator[str]:
         """Runs in a worker thread; always releases its concurrency slot and records spend."""
         meter = UsageMeter()
         started = time.perf_counter()
@@ -206,7 +220,9 @@ def create_app(
             streamed = False
             config = {"configurable": {"on_usage": meter.add}}
             for mode, chunk in state["graph"].stream(
-                {"question": question}, config, stream_mode=["custom", "values"]
+                {"question": question, "history": history},
+                config,
+                stream_mode=["custom", "values"],
             ):
                 if mode == "custom":
                     streamed = True
@@ -224,9 +240,11 @@ def create_app(
             )
             if referral:
                 yield _sse("referral", referral)
+            if final.get("options"):
+                yield _sse("clarify", {"options": final["options"]})
             yield _sse("sources", sources)
             yield _sse("done", {"route": route, "cached": False})
-            if route in ("answered", "referral"):
+            if not history and route in ("answered", "referral"):
                 cache.set(
                     question,
                     {

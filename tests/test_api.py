@@ -168,3 +168,12 @@ def test_security_headers_and_health() -> None:
 def test_docs_are_hidden_in_prod(path: str) -> None:
     client, _ = _client(env="prod", anthropic_api_key="sk-test", ip_hash_secret="s3cret")
     assert client.get(path).status_code == 404
+
+
+def test_retry_after_is_readable_by_the_browser() -> None:
+    client, _ = _client()
+    for i in range(3):
+        _ask(client, f"question number {i}", headers={"origin": "http://localhost:3000"})
+    blocked = _ask(client, "question number 4", headers={"origin": "http://localhost:3000"})
+    assert blocked.status_code == 429
+    assert "retry-after" in blocked.headers["access-control-expose-headers"].lower()

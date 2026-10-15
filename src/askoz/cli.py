@@ -86,6 +86,9 @@ def main() -> None:
     ask = sub.add_parser("ask", help="answer a question with citations")
     ask.add_argument("question")
     ask.add_argument("-v", "--verbose", action="store_true", help="show the query plan")
+    ask.add_argument(
+        "--history", action="append", default=[], help="an earlier question (repeatable)"
+    )
     args = parser.parse_args()
 
     # Imported per command so `askoz doctor` doesn't pay Scrapy's import cost.
@@ -138,7 +141,7 @@ def main() -> None:
     elif args.command == "eval":
         sys.exit(run_eval(args))
     elif args.command == "ask":
-        run_ask(args.question, verbose=args.verbose)
+        run_ask(args.question, verbose=args.verbose, history=args.history)
     elif args.command == "eval-routing":
         sys.exit(run_eval_routing())
     elif args.command == "check-links":
@@ -159,14 +162,16 @@ def main() -> None:
         )
 
 
-def run_ask(question: str, *, verbose: bool) -> None:
+def run_ask(question: str, *, verbose: bool, history: list[str] | None = None) -> None:
     import anthropic
 
     from askoz.answer.graph import build_graph
 
     final: dict[str, Any] = {}
     streamed = False
-    stream = build_graph().stream({"question": question}, stream_mode=["custom", "values"])
+    stream = build_graph().stream(
+        {"question": question, "history": history or []}, stream_mode=["custom", "values"]
+    )
     try:
         for mode, chunk in cast(Iterator[tuple[str, dict[str, Any]]], stream):
             if mode == "custom":
@@ -183,6 +188,8 @@ def run_ask(question: str, *, verbose: bool) -> None:
         sys.exit("Couldn't reach the Claude API. Check your internet connection.")
     if not streamed:
         print(final.get("answer", ""))
+    for number, option in enumerate(final.get("options", []), 1):
+        print(f"  {number}. {option}")
     if referral := final.get("referral"):
         print(f"\n\nWhere to go: {referral.name} ({referral.covers})")
         for link in referral.links:
@@ -208,7 +215,12 @@ def run_eval_routing() -> int:
     for r in results:
         mark = "ok  " if r["ok"] else "MISS"
         agency = f" -> {r['refer_to']}" if r["refer_to"] else ""
-        print(f"{mark} {r['expect']:12} got {r['got']}{agency:24} {r['question']}")
+        context = f" (after: {r['history'][-1]})" if r["history"] else ""
+        print(f"{mark} {r['expect']:12} got {r['got']}{agency:24} {r['question']}{context}")
+        if r["history"]:
+            print(f"     standalone: {r['standalone']}")
+        if r["options"]:
+            print(f"     options: {r['options']}")
         if r["suggestion"]:
             print(f"     suggests: {r['suggestion']}")
     passed = sum(r["ok"] for r in results)

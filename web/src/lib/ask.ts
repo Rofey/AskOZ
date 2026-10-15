@@ -18,6 +18,7 @@ export type Referral = {
 export type AskHandlers = {
   onText: (text: string) => void;
   onReferral: (referral: Referral) => void;
+  onClarify: (options: string[]) => void; // the question was ambiguous: pick one
   onSources: (sources: Source[]) => void;
   onDone: (info: { route: string; cached: boolean }) => void;
 };
@@ -25,23 +26,43 @@ export type AskHandlers = {
 // An error with a message that is safe and useful to show the person.
 export class AskError extends Error {}
 
+// "about 3 minutes", "about 14 hours". Seconds come from the API's Retry-After.
+export function waitText(seconds: number): string {
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  if (minutes < 90) return `about ${minutes} minute${minutes === 1 ? "" : "s"}`;
+  const hours = Math.round(minutes / 60);
+  return `about ${hours} hour${hours === 1 ? "" : "s"}`;
+}
+
 function messageFor(status: number, detail: string | undefined, retryAfter: string | null): string {
   if (status === 429) {
-    const minutes = Math.ceil(Number(retryAfter ?? 60) / 60);
-    return `You've reached the question limit. Please try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+    const seconds = Number(retryAfter);
+    if (!retryAfter || !Number.isFinite(seconds)) {
+      return "You've reached the question limit. Please try again later.";
+    }
+    return `You've reached the question limit. Please try again in ${waitText(seconds)}.`;
   }
   if (status === 422) return `Questions need to be between 3 and ${MAX_QUESTION_CHARS} characters.`;
   if (status === 503) return detail ?? "AskOz is busy right now. Please try again shortly.";
   return "Sorry, something went wrong. Please try again.";
 }
 
-export async function ask(question: string, handlers: AskHandlers, signal: AbortSignal): Promise<void> {
+export const MAX_HISTORY = 3; // keep in step with the API's AskRequest.history limit
+
+// `history`: the conversation's earlier questions (never answers), oldest first.
+// It lives only in this browser tab; the server uses it for this one request.
+export async function ask(
+  question: string,
+  history: string[],
+  handlers: AskHandlers,
+  signal: AbortSignal,
+): Promise<void> {
   let response: Response;
   try {
     response = await fetch(`${API_URL}/v1/ask`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history: history.slice(-MAX_HISTORY) }),
       signal,
     });
   } catch (error) {
@@ -58,6 +79,7 @@ export async function ask(question: string, handlers: AskHandlers, signal: Abort
     const payload = JSON.parse(data);
     if (event === "text") handlers.onText(payload.text);
     else if (event === "referral") handlers.onReferral(payload);
+    else if (event === "clarify") handlers.onClarify(payload.options);
     else if (event === "sources") handlers.onSources(payload);
     else if (event === "done") handlers.onDone(payload);
     else if (event === "error") throw new AskError(payload.message);

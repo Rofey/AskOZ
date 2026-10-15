@@ -44,9 +44,16 @@ def _on_usage(config: RunnableConfig):
     return (config.get("configurable") or {}).get("on_usage")
 
 
+CLARIFY = "That could mean a few different things. Which one do you mean?"
+
+
 class AskState(TypedDict):
     question: str
+    # Earlier questions in this conversation (questions only, from the browser),
+    # used to resolve "it", "my assessment" and the like.
+    history: NotRequired[list[str]]
     identifiers: NotRequired[list[str]]  # kinds of personal identifier found
+    options: NotRequired[list[str]]  # specific questions to choose from when ambiguous
     plan: NotRequired[QueryPlan]
     pages: NotRequired[list[SourcePage]]  # retrieved candidates
     answer: NotRequired[str]
@@ -55,7 +62,15 @@ class AskState(TypedDict):
     referral: NotRequired[Agency]
     suggestion: NotRequired[str]  # a related question AskOz can answer
     route: NotRequired[
-        Literal["blocked", "out_of_scope", "referral", "nothing_found", "answered", "refused"]
+        Literal[
+            "blocked",
+            "out_of_scope",
+            "clarify",
+            "referral",
+            "nothing_found",
+            "answered",
+            "refused",
+        ]
     ]
 
 
@@ -63,7 +78,9 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
     searcher = searcher or Searcher()
 
     def guard(state: AskState) -> dict:
-        found = find_identifiers(state["question"])
+        # History is checked too: it goes to Claude with the question, so an
+        # identifier typed earlier must not slip through that way.
+        found = find_identifiers("\n".join([*state.get("history", []), state["question"]]))
         if not found:
             return {"identifiers": []}
         kinds = " and ".join(found)
@@ -78,9 +95,19 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
         }
 
     def plan(state: AskState, config: RunnableConfig) -> dict:
-        query_plan = plan_queries(state["question"], on_usage=_on_usage(config))
+        query_plan = plan_queries(
+            state["question"], on_usage=_on_usage(config), history=state.get("history")
+        )
         if not query_plan.in_scope:
             return {"plan": query_plan, "route": "out_of_scope", "answer": OUT_OF_SCOPE}
+        if query_plan.ambiguous:
+            # Asking costs one planner call; guessing wrong costs a wrong answer.
+            return {
+                "plan": query_plan,
+                "route": "clarify",
+                "answer": CLARIFY,
+                "options": query_plan.interpretations,
+            }
         if query_plan.coverage == "covered" or query_plan.refer_to is None:
             return {"plan": query_plan}
         agency = AGENCIES[query_plan.refer_to]
@@ -99,7 +126,9 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
     def retrieve(state: AskState) -> dict:
         query_plan = state.get("plan")
         assert query_plan is not None  # set by `plan`, which always runs first
-        queries = [state["question"], *query_plan.search_queries]
+        # The standalone form carries context from the history ("my assessment"
+        # -> "my skills assessment for the 189 visa").
+        queries = [query_plan.standalone_question, *query_plan.search_queries]
         pages = group_into_pages(ranked_chunks(searcher, queries))
         if not pages:
             return {
@@ -112,8 +141,9 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
 
     def generate(state: AskState, config: RunnableConfig) -> dict:
         write = get_stream_writer()
+        query_plan = state.get("plan")
         answer = generate_answer(
-            state["question"],
+            query_plan.standalone_question if query_plan else state["question"],
             state.get("pages", []),
             on_text=lambda t: write({"text": t}),
             on_usage=_on_usage(config),

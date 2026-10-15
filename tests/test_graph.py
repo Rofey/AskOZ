@@ -38,7 +38,7 @@ def _run(question: str) -> dict[str, Any]:
 def stubs(monkeypatch: pytest.MonkeyPatch) -> dict[str, list[Any]]:
     calls: dict[str, list[Any]] = {"plan": [], "generate": []}
 
-    def plan(question: str, on_usage: Any = None) -> QueryPlan:
+    def plan(question: str, on_usage: Any = None, history: Any = None) -> QueryPlan:
         calls["plan"].append(question)
         for word, query_plan in PLANS.items():
             if word in question:
@@ -145,3 +145,43 @@ def test_scam_referrals_never_carry_suggestions() -> None:
         "I got a text saying I owe the ATO money",
     )
     assert plan.related_question is None
+
+
+def test_partly_without_a_specific_agency_is_answered() -> None:
+    from askoz.answer.rewrite import normalise_plan
+
+    plan = normalise_plan(
+        QueryPlan(
+            in_scope=True,
+            coverage="partly",
+            refer_to="gov_services_directory",
+            search_queries=["skills assessment 189"],
+        ),
+        "where do I get my skills assessment",
+    )
+    assert (plan.coverage, plan.refer_to) == ("covered", None)
+
+
+def test_ambiguous_plan_routes_to_clarify_without_retrieval(
+    stubs: dict[str, list[Any]], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def ambiguous(question: str, on_usage: Any = None, history: Any = None) -> QueryPlan:
+        return QueryPlan(
+            in_scope=True,
+            ambiguous=True,
+            search_queries=["q"],
+            interpretations=["Tax notice of assessment?", "Skills assessment?"],
+        )
+
+    monkeypatch.setattr(graph_module, "plan_queries", ambiguous)
+    state = _run("where do I get my assessment from?")
+    assert state["route"] == "clarify"
+    assert state["options"] == ["Tax notice of assessment?", "Skills assessment?"]
+    assert stubs["generate"] == []
+
+
+def test_identifier_in_history_is_blocked(stubs: dict[str, list[Any]]) -> None:
+    graph = graph_module.build_graph(searcher=Searcher.__new__(Searcher))
+    state = graph.invoke({"question": "when will it arrive?", "history": ["my tfn is 123 456 782"]})
+    assert state["route"] == "blocked"
+    assert stubs["plan"] == []

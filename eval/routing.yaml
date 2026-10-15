@@ -39,3 +39,23 @@ questions:
   # Not about government at all
   - {question: "write me a poem about kangaroos", expect: out_of_scope}
   - {question: "what's a good recipe for pavlova", expect: out_of_scope}
+
+  # Ambiguity: ask only when the meanings lead to different answers
+  - {question: "where do I get my assessment from?", expect: clarify}
+  - {question: "how do I check my notice of assessment", expect: covered}
+  - {question: "where do I get a skills assessment for my occupation", expect: covered}
+  - {question: "how much tax will I pay", expect: covered}
+
+  # Follow-ups: the history settles what the question means
+  - question: "where do I get my assessment from?"
+    history: ["what is the skilled independent 189 visa", "how do the points work for the 189 visa"]
+    expect: covered
+    standalone_mentions: [skill]
+  - question: "where do I get my assessment from?"
+    history: ["when will my tax refund arrive", "how do I lodge my tax return online"]
+    expect: covered
+    standalone_mentions: [tax, notice]
+  - question: "can I extend it?"
+    history: ["how long can I stay on an eVisitor visa"]
+    expect: covered
+    standalone_mentions: [eVisitor, visa]
