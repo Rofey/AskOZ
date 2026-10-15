@@ -7,6 +7,7 @@ answers current and retrieval sharp.
 
 import re
 from dataclasses import dataclass
+from typing import Literal
 from urllib.parse import urlsplit
 
 # A year from 2000-2023 in a URL path marks archived, year-specific guidance
@@ -31,6 +32,11 @@ class Source:
     # The referral agency (askoz.answer.agencies) this source replaces once live:
     # its questions become answerable instead of referred.
     replaces_referral: str | None = None
+    # trafilatura mode. "precision" drops anything doubtful (it keeps the ATO's
+    # link-only hub pages out of the index); "recall" keeps styled and linked
+    # words that some sites put mid-sentence ("access to **fair treatment**
+    # when buying..."), which precision silently deletes. Measure before changing.
+    extraction: Literal["precision", "recall"] = "precision"
 
     def allows(self, url: str) -> bool:
         parts = urlsplit(url)
@@ -82,6 +88,25 @@ SOURCES: dict[str, Source] = {
             replaces_referral="services_australia",
         ),
         Source(
+            name="study_australia",
+            agency="Study Australia (Australian Government)",
+            domain="www.studyaustralia.gov.au",
+            sitemap_url="https://www.studyaustralia.gov.au/sitemap.xml",
+            allow=(
+                r"^/en/(plan-your-studies|plan-your-move|life-in-australia|work-in-australia)/",
+            ),
+            # Course-category marketing, the course search tool, and pages for
+            # education agents aren't answers to international students' questions.
+            deny=(r"/areas-of-study(/|$)", r"/find-a-course(/|$)", r"(?i)/agent-hub(/|$)"),
+            # Precision dropped key words from 28% of the text here, junk unchanged.
+            extraction="recall",
+            covers=(
+                "studying in Australia as an international student: choosing and changing "
+                "courses or providers, costs of living, accommodation, student support and "
+                "safety, working while studying, and preparing to move"
+            ),
+        ),
+        Source(
             name="ato",
             agency="Australian Taxation Office",
             domain="www.ato.gov.au",
@@ -97,3 +122,8 @@ SOURCES: dict[str, Source] = {
         ),
     ]
 }
+
+
+def source_for_url(url: str) -> Source | None:
+    host = urlsplit(url).hostname
+    return next((s for s in SOURCES.values() if s.domain == host), None)

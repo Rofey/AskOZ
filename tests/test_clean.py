@@ -46,3 +46,12 @@ def test_decodes_entities() -> None:
 def test_page_without_real_content_is_skipped() -> None:
     hub = b"<html><body><h1>Topics</h1><ul><li><a href='/a'>A</a></li></ul></body></html>"
     assert clean_html(hub) is None
+
+
+def test_tidy_markdown_removes_layout_debris() -> None:
+    from askoz.ingest.clean import tidy_markdown
+
+    messy = (
+        "# Title\n\nSkip to content or footer\n\n   \n\t\n\n##  \n\n### \n\nReal text\n\n\n\nMore"
+    )
+    assert tidy_markdown(messy) == "# Title\n\nReal text\n\nMore"

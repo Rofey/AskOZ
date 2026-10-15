@@ -5,6 +5,7 @@ chunker splits on them, and each chunk remembers which section it came from.
 """
 
 import contextlib
+import re
 from dataclasses import dataclass
 from datetime import date
 from urllib.parse import urlsplit
@@ -12,6 +13,7 @@ from urllib.parse import urlsplit
 import lxml.html
 import trafilatura
 
+from askoz.crawl.sources import source_for_url
 from askoz.ingest.sites import home_affairs
 
 # Markup that isn't content: empty jump-link anchors (trafilatura drops any
@@ -33,6 +35,27 @@ class CleanPage:
     title: str
     text: str  # Markdown, starting with "# {title}"
     last_updated: date | None
+
+
+# Accessibility skip links that sometimes survive extraction as text.
+_SKIP_LINK_LINES = {"skip to content", "skip to content or footer", "skip to main content"}
+
+
+def tidy_markdown(text: str) -> str:
+    """Drop whitespace-only lines, empty headings and skip-link text, and
+    collapse runs of blank lines. Some page builders leave dozens of each."""
+    lines: list[str] = []
+    for raw in text.splitlines():
+        line = raw.rstrip()
+        stripped = line.strip()
+        if stripped.lower() in _SKIP_LINK_LINES or re.fullmatch(r"#+", stripped):
+            continue
+        if not stripped:
+            if lines and lines[-1] == "":
+                continue
+            line = ""
+        lines.append(line)
+    return "\n".join(lines).strip()
 
 
 def clean_html(html: bytes, url: str = "") -> CleanPage | None:
@@ -59,14 +82,19 @@ def clean_html(html: bytes, url: str = "") -> CleanPage | None:
         or (metadata.title if metadata else "")
         or ""
     )
+    source = source_for_url(url)
+    recall = source is not None and source.extraction == "recall"
     html_body = trafilatura.extract(
         tree,
         output_format="markdown",
         include_tables=True,
         include_links=False,  # link URLs are noise for embeddings; citations use the page URL
-        favor_precision=True,  # when unsure, leave it out: boilerplate hurts more than gaps
+        # Precision by default: when unsure, leave it out, since boilerplate hurts
+        # more than gaps. Some sources need recall (see Source.extraction).
+        favor_precision=not recall,
+        favor_recall=recall,
     )
-    body = "\n\n".join(part for part in (html_body, schema_text) if part)
+    body = tidy_markdown("\n\n".join(part for part in (html_body, schema_text) if part))
     if not body or len(body) < MIN_BODY_CHARS or not title:
         return None
 

@@ -1,14 +1,14 @@
 {
-  "run_at": "2026-10-15T04:02:22+00:00",
+  "run_at": "2026-10-15T07:46:09+00:00",
   "query_instruction": false,
-  "questions": 73,
+  "questions": 82,
   "modes": {
     "vector": {
       "overall": {
-        "hit@1": 0.6301369863013698,
-        "hit@5": 0.8356164383561644,
-        "hit@10": 0.9178082191780822,
-        "mrr": 0.721249184605349
+        "hit@1": 0.6463414634146342,
+        "hit@5": 0.8536585365853658,
+        "hit@10": 0.9390243902439024,
+        "mrr": 0.7394792876500194
       },
       "by_style": {
         "acronym": {
@@ -24,16 +24,16 @@
           "mrr": 0.8363095238095237
         },
         "plain": {
-          "hit@1": 0.5777777777777777,
-          "hit@5": 0.7777777777777778,
-          "hit@10": 0.8888888888888888,
-          "mrr": 0.6687037037037037
+          "hit@1": 0.6111111111111112,
+          "hit@5": 0.8148148148148148,
+          "hit@10": 0.9259259259259259,
+          "mrr": 0.7051440329218107
         }
       },
       "ranks": {
         "whm-tax-rate": 1,
         "whm-residency": 1,
-        "student-work-tax": 8,
+        "student-work-tax": 9,
         "newcomer-tax-free-threshold": 3,
         "residency-183-days": 1,
         "am-i-resident": 2,
@@ -82,7 +82,7 @@
         "bpay": 1,
         "late-penalty": 8,
         "gic": 1,
-        "dont-pay": null,
+        "dont-pay": 3,
         "hecs-repayment": null,
         "help-overseas": 3,
         "help-balance": 1,
@@ -103,22 +103,31 @@
         "vevo": 1,
         "visa-expiring": 1,
         "visa-exploitation": 10,
-        "english-test": 3
+        "english-test": 3,
+        "student-living-costs": 2,
+        "oshc": 1,
+        "student-accommodation": 6,
+        "change-university": 1,
+        "student-work-rights": 1,
+        "emergency-number": 1,
+        "student-family": 1,
+        "scholarships": 1,
+        "first-week": 1
       }
     },
     "keyword": {
       "overall": {
-        "hit@1": 0.2328767123287671,
-        "hit@5": 0.4794520547945205,
-        "hit@10": 0.5753424657534246,
-        "mrr": 0.3523755164166123
+        "hit@1": 0.2682926829268293,
+        "hit@5": 0.5121951219512195,
+        "hit@10": 0.573170731707317,
+        "mrr": 0.37728416569879986
       },
       "by_style": {
         "acronym": {
           "hit@1": 0.25,
           "hit@5": 0.5,
-          "hit@10": 0.625,
-          "mrr": 0.3888888888888889
+          "hit@10": 0.5,
+          "mrr": 0.375
         },
         "official": {
           "hit@1": 0.3,
@@ -127,10 +136,10 @@
           "mrr": 0.39880952380952384
         },
         "plain": {
-          "hit@1": 0.2,
-          "hit@5": 0.4666666666666667,
-          "hit@10": 0.5777777777777777,
-          "mrr": 0.32524691358024693
+          "hit@1": 0.25925925925925924,
+          "hit@5": 0.5185185185185185,
+          "hit@10": 0.5925925925925926,
+          "mrr": 0.3696502057613169
         }
       },
       "ranks": {
@@ -144,9 +153,9 @@
         "moving-overseas-lodge": 2,
         "leaving-lodge-early": 1,
         "foreign-income-offset": null,
-        "tfn-visa-holder": 9,
+        "tfn-visa-holder": null,
         "tfn-citizen": null,
-        "tfn-lost": 8,
+        "tfn-lost": 9,
         "tfn-stolen": null,
         "tfn-what": null,
         "super-back-leaving": 1,
@@ -190,7 +199,7 @@
         "help-overseas": null,
         "help-balance": 2,
         "bushfire": 3,
-        "student-visa-work": 9,
+        "student-visa-work": null,
         "visitor-stay": 2,
         "whv-age": 2,
         "evisitor-europe": null,
@@ -206,34 +215,43 @@
         "vevo": 2,
         "visa-expiring": null,
         "visa-exploitation": null,
-        "english-test": 1
+        "english-test": 1,
+        "student-living-costs": 1,
+        "oshc": 4,
+        "student-accommodation": null,
+        "change-university": null,
+        "student-work-rights": 1,
+        "emergency-number": 1,
+        "student-family": 5,
+        "scholarships": 1,
+        "first-week": 1
       }
     },
     "hybrid": {
       "overall": {
-        "hit@1": 0.4931506849315068,
-        "hit@5": 0.7808219178082192,
-        "hit@10": 0.9041095890410958,
-        "mrr": 0.605071754729289
+        "hit@1": 0.5121951219512195,
+        "hit@5": 0.7926829268292683,
+        "hit@10": 0.9024390243902439,
+        "mrr": 0.6199622531939605
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.625,
+          "hit@1": 0.5,
           "hit@5": 0.625,
           "hit@10": 0.875,
-          "mrr": 0.6666666666666666
+          "mrr": 0.6041666666666666
         },
         "official": {
-          "hit@1": 0.4,
+          "hit@1": 0.45,
           "hit@5": 0.85,
           "hit@10": 1.0,
-          "mrr": 0.5725595238095238
+          "mrr": 0.5892261904761905
         },
         "plain": {
-          "hit@1": 0.5111111111111111,
-          "hit@5": 0.7777777777777778,
-          "hit@10": 0.8666666666666667,
-          "mrr": 0.6085714285714285
+          "hit@1": 0.5370370370370371,
+          "hit@5": 0.7962962962962963,
+          "hit@10": 0.8703703703703703,
+          "mrr": 0.6336860670194004
         }
       },
       "ranks": {
@@ -247,7 +265,7 @@
         "moving-overseas-lodge": 1,
         "leaving-lodge-early": 1,
         "foreign-income-offset": 7,
-        "tfn-visa-holder": 1,
+        "tfn-visa-holder": 2,
         "tfn-citizen": 1,
         "tfn-lost": 1,
         "tfn-stolen": 6,
@@ -291,11 +309,11 @@
         "dont-pay": 5,
         "hecs-repayment": null,
         "help-overseas": 6,
-        "help-balance": 2,
+        "help-balance": 1,
         "bushfire": 1,
         "student-visa-work": 2,
         "visitor-stay": 1,
-        "whv-age": 2,
+        "whv-age": 3,
         "evisitor-europe": 7,
         "eta-usa": 1,
         "transit": 5,
@@ -309,15 +327,24 @@
         "vevo": 1,
         "visa-expiring": 1,
         "visa-exploitation": null,
-        "english-test": 1
+        "english-test": 1,
+        "student-living-costs": 1,
+        "oshc": 1,
+        "student-accommodation": null,
+        "change-university": 2,
+        "student-work-rights": 1,
+        "emergency-number": 1,
+        "student-family": 3,
+        "scholarships": 1,
+        "first-week": 1
       }
     },
     "rerank": {
       "overall": {
-        "hit@1": 0.5342465753424658,
-        "hit@5": 0.8904109589041096,
-        "hit@10": 0.9178082191780822,
-        "mrr": 0.6676940639269406
+        "hit@1": 0.5487804878048781,
+        "hit@5": 0.8780487804878049,
+        "hit@10": 0.9146341463414634,
+        "mrr": 0.6742886178861789
       },
       "by_style": {
         "acronym": {
@@ -333,16 +360,16 @@
           "mrr": 0.7470833333333333
         },
         "plain": {
-          "hit@1": 0.4666666666666667,
-          "hit@5": 0.8666666666666667,
+          "hit@1": 0.5,
+          "hit@5": 0.8518518518518519,
           "hit@10": 0.8888888888888888,
-          "mrr": 0.6233333333333333
+          "mrr": 0.6407407407407407
         }
       },
       "ranks": {
         "whm-tax-rate": 1,
         "whm-residency": 1,
-        "student-work-tax": 3,
+        "student-work-tax": 4,
         "newcomer-tax-free-threshold": 5,
         "residency-183-days": 1,
         "am-i-resident": 1,
@@ -374,7 +401,7 @@
         "mls-no-insurance": null,
         "mls-cover-level": 3,
         "phi-rebate-thresholds": 1,
-        "lifetime-health-cover": 3,
+        "lifetime-health-cover": 4,
         "need-to-lodge": 1,
         "first-return": 2,
         "free-help": 10,
@@ -396,23 +423,32 @@
         "help-overseas": 4,
         "help-balance": 1,
         "bushfire": 1,
-        "student-visa-work": 1,
+        "student-visa-work": 2,
         "visitor-stay": 2,
         "whv-age": 1,
-        "evisitor-europe": 4,
+        "evisitor-europe": 3,
         "eta-usa": 1,
-        "transit": 5,
+        "transit": 6,
         "post-study": 1,
         "skilled-points": 4,
         "employer-sponsor": 1,
         "partner-onshore": 1,
-        "bring-parents": 3,
+        "bring-parents": 4,
         "pr-to-citizen": 1,
         "citizenship-test": 1,
         "vevo": 2,
         "visa-expiring": 1,
         "visa-exploitation": null,
-        "english-test": 1
+        "english-test": 1,
+        "student-living-costs": 4,
+        "oshc": 1,
+        "student-accommodation": null,
+        "change-university": 1,
+        "student-work-rights": 1,
+        "emergency-number": 1,
+        "student-family": 1,
+        "scholarships": 1,
+        "first-week": 1
       }
     }
   }

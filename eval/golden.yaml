@@ -524,3 +524,66 @@ questions:
     style: plain
     relevant: [https://immi.homeaffairs.gov.au/help-support/meeting-our-requirements/english-language]
     evidence: English
+
+  # --- Studying in Australia (Study Australia) --------------------------------
+  - id: student-living-costs
+    question: how much money do I need to live in Australia as a student
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/life-in-australia/living-and-education-costs]
+    evidence: cost
+
+  - id: oshc
+    question: what health insurance do international students need
+    style: plain
+    relevant:
+      - https://www.studyaustralia.gov.au/en/plan-your-move/overseas-student-health-cover-oshc
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/*
+    evidence: OSHC
+
+  - id: student-accommodation
+    question: where can international students live, what are the housing options
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/life-in-australia/accommodation]
+    evidence: accommodation
+
+  - id: change-university
+    question: can I change my university after I arrive in Australia
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/plan-your-studies/changing-your-course-or-provider]
+    evidence: provider
+
+  - id: student-work-rights
+    question: what are my rights at work as an international student
+    style: plain
+    relevant:
+      - https://www.studyaustralia.gov.au/en/work-in-australia/work-rights-and-responsibilities/*
+      - https://immi.homeaffairs.gov.au/visas/working-in-australia/work-rights-and-exploitation
+      # Addressed to employers, but states overseas workers' rights directly.
+      - https://immi.homeaffairs.gov.au/visas/employing-and-sponsoring-someone/worker-rights
+    evidence: rights
+
+  - id: emergency-number
+    question: what number do I call in an emergency in Australia
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/life-in-australia/safety-in-australia/emergencies]
+    evidence: "000"
+
+  - id: student-family
+    question: can my partner and kids come with me while I study in Australia
+    style: plain
+    relevant:
+      - https://www.studyaustralia.gov.au/en/plan-your-move/bringing-your-family
+      - https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500/*
+    evidence: family
+
+  - id: scholarships
+    question: are there scholarships for international students
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/plan-your-studies/scholarships]
+    evidence: scholarship
+
+  - id: first-week
+    question: what should I sort out in my first week after arriving to study
+    style: plain
+    relevant: [https://www.studyaustralia.gov.au/en/plan-your-move/your-first-week-in-australia]
+    evidence: week
