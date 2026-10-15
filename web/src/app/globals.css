@@ -1,47 +1,31 @@
 @import "tailwindcss";
 
-/* Colour tokens. Deliberately not the Australian Government's green and gold:
-   AskOz must not look official. Text colours meet WCAG AA contrast (4.5:1+). */
+/* Colour tokens: white page, one blue accent. Deliberately not the Australian
+   Government's green and gold, because AskOz must not look official. Text colours
+   meet WCAG AA contrast on white (4.5:1+). */
 :root {
-  --background: #fbfbf9;
-  --foreground: #1b1f24;
-  --surface: #ffffff;
-  --line: #d9dde3;
-  --muted: #5b6472;
-  --accent: #0f6466;
-  --on-accent: #ffffff;
-  --note-bg: #eef3f7;
-  --note: #2c4a63;
+  --background: #ffffff;
+  --foreground: #111827;
+  --muted: #5b6474;
+  --line: #e5e7eb;
+  --subtle: #f6f7f9;
+  --accent: #0b57d0;
+  --accent-strong: #0842a0;
+  --accent-soft: #e8f0fe;
   --warn-bg: #fdf0ed;
   --warn: #8a2c17;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #121417;
-    --foreground: #e6e8eb;
-    --surface: #1a1d21;
-    --line: #2e333a;
-    --muted: #9aa3ae;
-    --accent: #5fc2c4;
-    --on-accent: #0b2526;
-    --note-bg: #1c2a35;
-    --note: #b8cfe0;
-    --warn-bg: #3a1d16;
-    --warn: #f3b6a5;
-  }
+  color-scheme: light;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-line: var(--line);
   --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-subtle: var(--subtle);
   --color-accent: var(--accent);
-  --color-on-accent: var(--on-accent);
-  --color-note-bg: var(--note-bg);
-  --color-note: var(--note);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
   --color-warn-bg: var(--warn-bg);
   --color-warn: var(--warn);
   --font-sans: var(--font-geist-sans);
@@ -56,16 +40,20 @@ body {
 
 /* Typography for streamed Markdown answers. */
 .answer {
-  line-height: 1.65;
+  line-height: 1.7;
 }
 .answer > * + * {
-  margin-top: 0.75rem;
+  margin-top: 0.85rem;
 }
 .answer h1,
 .answer h2,
 .answer h3 {
   font-weight: 600;
-  margin-top: 1.25rem;
+  font-size: 1.05rem;
+  margin-top: 1.4rem;
+}
+.answer strong {
+  font-weight: 600;
 }
 .answer ul,
 .answer ol {
@@ -78,28 +66,40 @@ body {
   list-style: decimal;
 }
 .answer li + li {
-  margin-top: 0.25rem;
+  margin-top: 0.3rem;
+}
+.answer li::marker {
+  color: var(--muted);
 }
 .answer a {
   color: var(--accent);
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .answer .citation {
-  text-decoration: none;
-  font-size: 0.75em;
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 0.15rem;
+  padding: 0 0.3rem;
+  border-radius: 0.375rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 0 0.15em;
-  border-radius: 0.25em;
-  background: var(--note-bg);
+  text-decoration: none;
+  vertical-align: 0.15em;
 }
 .answer .citation:hover,
 .answer .citation:focus-visible {
   background: var(--accent);
-  color: var(--on-accent);
+  color: #fff;
 }
 
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+    animation: none !important;
   }
 }

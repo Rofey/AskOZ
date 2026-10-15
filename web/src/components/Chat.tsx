@@ -1,9 +1,24 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { AnswerText } from "@/components/AnswerText";
-import { ask, AskError, MAX_QUESTION_CHARS, type Source } from "@/lib/ask";
+import {
+  ExternalLink,
+  EyeOff,
+  GradCap,
+  HeartPulse,
+  LogoMark,
+  PiggyBank,
+  Plane,
+  Plus,
+  Quote,
+  Receipt,
+  ShieldCheck,
+  Wallet,
+} from "@/components/icons";
+import { PromptBox } from "@/components/PromptBox";
+import { ask, AskError, type Source } from "@/lib/ask";
 
 type Exchange = {
   id: string;
@@ -16,39 +31,85 @@ type Exchange = {
 
 const EXAMPLES = [
   "How much tax do backpackers pay?",
-  "How do I get a TFN if I'm on a visa?",
   "Can I get my super back when I leave Australia?",
-  "Do I have to pay the Medicare levy surcharge?",
+  "Do I pay tax on Centrelink payments?",
 ];
+
+const TOPICS = [
+  { icon: Plane, title: "New to Australia", text: "TFNs, residency, working holiday tax", prompt: "How do I get a tax file number if I'm on a visa?" },
+  { icon: Receipt, title: "Tax returns", text: "Lodging, refunds, amendments", prompt: "How do I lodge my first tax return?" },
+  { icon: PiggyBank, title: "Super", text: "Employer super, access, DASP", prompt: "When can I access my super?" },
+  { icon: HeartPulse, title: "Medicare & health cover", text: "Medicare levy and surcharge", prompt: "Do I have to pay the Medicare levy surcharge?" },
+  { icon: GradCap, title: "Study loans", text: "HELP repayments and balances", prompt: "How much do I have to repay on my HELP debt?" },
+  { icon: Wallet, title: "Paying the ATO", text: "Payment plans, debts, penalties", prompt: "What can I do if I can't pay my tax bill?" },
+];
+
+const TRUST = [
+  { icon: ShieldCheck, text: "Answers only from official .gov.au pages" },
+  { icon: Quote, text: "Every answer links to its sources" },
+  { icon: EyeOff, text: "Questions aren't saved" },
+];
+
+// Distance from the bottom (px) within which we keep following a streaming answer.
+const FOLLOW_THRESHOLD = 96;
 
 export function Chat() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [draft, setDraft] = useState("");
+  const [following, setFollowing] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const busy = exchanges.at(-1)?.status === "streaming";
+  const started = exchanges.length > 0;
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  // Follow the answer as it streams, but only while the reader is at the bottom:
+  // if they scroll up to read, we stop moving the page under them.
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (el && following) el.scrollTop = el.scrollHeight;
+  }, [exchanges, following]);
+
+  const onScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (el) setFollowing(el.scrollHeight - el.scrollTop - el.clientHeight < FOLLOW_THRESHOLD);
+  }, []);
+
+  function fillPrompt(text: string) {
+    setDraft(text);
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      el?.focus();
+      el?.setSelectionRange(text.length, text.length);
+    });
+  }
 
   function update(id: string, change: (e: Exchange) => Partial<Exchange>) {
     setExchanges((all) => all.map((e) => (e.id === id ? { ...e, ...change(e) } : e)));
   }
 
-  async function submit(question: string) {
-    const trimmed = question.trim();
-    if (trimmed.length < 3 || busy) return;
+  function newConversation() {
+    abortRef.current?.abort();
+    setExchanges([]);
+    setDraft("");
+    setFollowing(true);
+  }
+
+  async function submit() {
+    const question = draft.trim();
+    if (question.length < 3 || busy) return;
     const id = crypto.randomUUID();
     const controller = new AbortController();
     abortRef.current = controller;
     setDraft("");
-    setExchanges((all) => [
-      ...all,
-      { id, question: trimmed, answer: "", sources: [], status: "streaming" },
-    ]);
+    setFollowing(true);
+    setExchanges((all) => [...all, { id, question, answer: "", sources: [], status: "streaming" }]);
 
     try {
       await ask(
-        trimmed,
+        question,
         {
           onText: (text) => update(id, (e) => ({ answer: e.answer + text })),
           onSources: (sources) => update(id, () => ({ sources })),
@@ -69,123 +130,201 @@ export function Chat() {
     }
   }
 
+  const prompt = (size: "hero" | "docked") => (
+    <PromptBox
+      ref={inputRef}
+      size={size}
+      value={draft}
+      onChange={setDraft}
+      onSubmit={submit}
+      onStop={() => abortRef.current?.abort()}
+      busy={busy}
+    />
+  );
+
   return (
-    <div className="flex flex-1 flex-col">
-      {exchanges.length === 0 ? (
-        <section aria-labelledby="examples-heading" className="mt-8">
-          <h2 id="examples-heading" className="text-sm font-medium text-muted">
-            Try asking
-          </h2>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {EXAMPLES.map((example) => (
-              <li key={example}>
+    <div className="flex h-dvh flex-col bg-white">
+      <header className="shrink-0 border-b border-line">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
+          <button
+            type="button"
+            onClick={newConversation}
+            className="flex items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            aria-label="AskOz home"
+          >
+            <LogoMark className="h-8 w-8" />
+            <span className="text-lg font-semibold tracking-tight">AskOz</span>
+          </button>
+          <div className="flex items-center gap-3">
+            <span className="hidden rounded-full bg-subtle px-3 py-1 text-xs text-muted sm:inline">
+              Independent · not a government website
+            </span>
+            {started && (
+              <button
+                type="button"
+                onClick={newConversation}
+                className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:bg-subtle"
+              >
+                <Plus className="h-4 w-4" />
+                New question
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {!started ? (
+        <main className="flex-1 overflow-y-auto">
+          <section className="mx-auto max-w-3xl px-4 pb-10 pt-14 text-center sm:pt-20">
+            <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+              Government info, <span className="text-accent">in plain English</span>
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted text-pretty">
+              Ask about tax, super, Medicare or study loans. Answers come only from official
+              Australian Government websites, with a link to every source.
+            </p>
+            <div className="mt-8 text-left">{prompt("hero")}</div>
+            <div className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Example questions">
+              {EXAMPLES.map((example) => (
                 <button
+                  key={example}
                   type="button"
-                  onClick={() => submit(example)}
-                  className="w-full rounded-lg border border-line bg-surface px-4 py-3 text-left text-sm transition hover:border-accent focus-visible:outline-2 focus-visible:outline-accent"
+                  onClick={() => fillPrompt(example)}
+                  className="rounded-full border border-line px-3.5 py-1.5 text-sm text-foreground transition hover:border-accent hover:text-accent"
                 >
                   {example}
                 </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : (
-        <ol className="mt-6 flex flex-col gap-8" aria-label="Questions and answers">
-          {exchanges.map((e) => (
-            <li key={e.id}>
-              <p className="font-semibold">{e.question}</p>
-              {/* aria-live announces the answer to screen readers as it streams in */}
-              <div aria-live="polite" aria-busy={e.status === "streaming"} className="mt-3">
-                {e.answer ? (
-                  <AnswerText text={e.answer} sources={e.sources} idPrefix={e.id} />
-                ) : e.status === "streaming" ? (
-                  <p className="text-muted">Searching official pages…</p>
-                ) : null}
-                {e.status === "error" && (
-                  <p role="alert" className="mt-2 rounded-md bg-warn-bg px-3 py-2 text-sm text-warn">
-                    {e.error}
-                  </p>
-                )}
-                {e.status === "stopped" && <p className="mt-2 text-sm text-muted">Stopped.</p>}
-              </div>
-              {e.sources.length > 0 && (
-                <section aria-label="Sources" className="mt-4 border-t border-line pt-3">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">Sources</h3>
-                  <ol className="mt-2 space-y-1 text-sm">
-                    {e.sources.map((s, i) => (
-                      <li key={s.url} id={`${e.id}-source-${i + 1}`} className="flex gap-2">
-                        <span className="text-muted">{i + 1}.</span>
-                        {s.url.startsWith("https://") ? (
-                          <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline decoration-line underline-offset-2 hover:decoration-accent">
-                            {s.title}
-                          </a>
-                        ) : (
-                          <span>{s.title}</span>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              )}
-            </li>
-          ))}
-        </ol>
-      )}
+              ))}
+            </div>
+          </section>
 
-      <form
-        className="sticky bottom-0 mt-8 bg-background pb-4 pt-2"
-        onSubmit={(event) => {
-          event.preventDefault();
-          submit(draft);
-        }}
-      >
-        <label htmlFor="question" className="sr-only">
-          Your question
-        </label>
-        <div className="flex items-end gap-2 rounded-xl border border-line bg-surface p-2 focus-within:border-accent">
-          <textarea
-            id="question"
-            ref={inputRef}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                submit(draft);
-              }
-            }}
-            maxLength={MAX_QUESTION_CHARS}
-            rows={2}
-            placeholder="Ask about tax, super, Medicare, study loans…"
-            aria-describedby="privacy-note"
-            className="flex-1 resize-none bg-transparent px-2 py-1 outline-none"
-          />
-          {busy ? (
-            <button
-              type="button"
-              onClick={() => abortRef.current?.abort()}
-              className="rounded-lg border border-line px-4 py-2 text-sm"
-            >
-              Stop
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={draft.trim().length < 3}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent disabled:opacity-40"
-            >
-              Ask
-            </button>
-          )}
-        </div>
-        <p id="privacy-note" className="mt-2 text-xs text-muted">
-          Don&apos;t include your TFN, Medicare or passport number. Questions aren&apos;t saved.
-          <span className="float-right tabular-nums">
-            {draft.length}/{MAX_QUESTION_CHARS}
-          </span>
-        </p>
-      </form>
+          <section aria-labelledby="topics-heading" className="mx-auto max-w-5xl px-4 pb-12">
+            <h2 id="topics-heading" className="text-center text-sm font-semibold uppercase tracking-wider text-muted">
+              Browse by topic
+            </h2>
+            <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {TOPICS.map(({ icon: Icon, title, text, prompt: topicPrompt }) => (
+                <li key={title}>
+                  <button
+                    type="button"
+                    onClick={() => fillPrompt(topicPrompt)}
+                    className="group flex w-full items-start gap-3 rounded-xl border border-line p-4 text-left transition hover:border-accent hover:shadow-sm"
+                  >
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span>
+                      <span className="block font-medium group-hover:text-accent">{title}</span>
+                      <span className="mt-0.5 block text-sm text-muted">{text}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section aria-label="Why AskOz" className="border-t border-line bg-subtle">
+            <ul className="mx-auto grid max-w-5xl gap-4 px-4 py-8 sm:grid-cols-3">
+              {TRUST.map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-center gap-3 text-sm">
+                  <Icon className="h-5 w-5 shrink-0 text-accent" />
+                  {text}
+                </li>
+              ))}
+            </ul>
+            <p className="mx-auto max-w-5xl px-4 pb-8 text-xs leading-5 text-muted">
+              AskOz is an independent service, not affiliated with or endorsed by the Australian
+              Government. It gives general information only, not financial, tax, legal or migration
+              advice. Always check the linked official page, or ask a registered tax agent or the
+              agency. AskOz currently covers Australian Taxation Office pages for individuals.
+            </p>
+          </section>
+        </main>
+      ) : (
+        <>
+          <div ref={scrollRef} onScroll={onScroll} className="relative flex-1 overflow-y-auto">
+            <main className="mx-auto max-w-3xl px-4 py-8">
+              <ol className="flex flex-col gap-10" aria-label="Questions and answers">
+                {exchanges.map((e) => (
+                  <li key={e.id}>
+                    <div className="flex justify-end">
+                      <p className="max-w-[85%] rounded-2xl rounded-br-md bg-accent px-4 py-2.5 text-white">
+                        {e.question}
+                      </p>
+                    </div>
+                    {/* aria-live announces the answer to screen readers as it streams in */}
+                    <div aria-live="polite" aria-busy={e.status === "streaming"} className="mt-5 flex gap-3">
+                      <LogoMark className="mt-0.5 h-7 w-7 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        {e.answer ? (
+                          <AnswerText text={e.answer} sources={e.sources} idPrefix={e.id} />
+                        ) : e.status === "streaming" ? (
+                          <p className="flex items-center gap-2 text-muted">
+                            <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
+                            Searching official pages…
+                          </p>
+                        ) : null}
+                        {e.status === "error" && (
+                          <p role="alert" className="mt-2 rounded-lg bg-warn-bg px-3 py-2 text-sm text-warn">
+                            {e.error}
+                          </p>
+                        )}
+                        {e.status === "stopped" && <p className="mt-2 text-sm text-muted">Stopped.</p>}
+                        {e.sources.length > 0 && (
+                          <section aria-label="Sources" className="mt-5">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">
+                              Sources
+                            </h3>
+                            <ol className="mt-2 grid gap-2">
+                              {e.sources.map((s, i) => (
+                                <li key={s.url} id={`${e.id}-source-${i + 1}`}>
+                                  {s.url.startsWith("https://") ? (
+                                    <a
+                                      href={s.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="group flex items-center gap-3 rounded-lg border border-line px-3 py-2 text-sm transition hover:border-accent"
+                                    >
+                                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-accent-soft text-xs font-semibold text-accent">
+                                        {i + 1}
+                                      </span>
+                                      <span className="min-w-0 flex-1">
+                                        <span className="block truncate font-medium group-hover:text-accent">{s.title}</span>
+                                        <span className="block truncate text-xs text-muted">
+                                          {new URL(s.url).hostname}
+                                        </span>
+                                      </span>
+                                      <ExternalLink className="h-4 w-4 shrink-0 text-muted" />
+                                    </a>
+                                  ) : (
+                                    <span className="text-sm">{s.title}</span>
+                                  )}
+                                </li>
+                              ))}
+                            </ol>
+                          </section>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </main>
+            {!following && busy && (
+              <button
+                type="button"
+                onClick={() => setFollowing(true)}
+                className="sticky bottom-4 left-1/2 mx-auto block -translate-x-0 rounded-full border border-line bg-white px-4 py-1.5 text-sm shadow-md"
+              >
+                ↓ Follow the answer
+              </button>
+            )}
+          </div>
+          <div className="shrink-0 border-t border-line bg-white">
+            <div className="mx-auto max-w-3xl px-4 pb-3 pt-3">{prompt("docked")}</div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
