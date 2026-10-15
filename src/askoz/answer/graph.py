@@ -2,7 +2,7 @@
 
     guard ──(identifier found)──────────────────────────────▶ END
       │
-    plan ──(out of scope)───────────────────────────────────▶ END
+    plan ──(out of scope / another agency's topic: referral)─▶ END
       │
     retrieve ──(nothing found)──────────────────────────────▶ END
       │
@@ -25,9 +25,11 @@ from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
+from askoz.answer.agencies import AGENCIES, Agency
 from askoz.answer.context import SourcePage, group_into_pages, ranked_chunks
 from askoz.answer.generate import generate_answer
 from askoz.answer.pii import find_identifiers
+from askoz.answer.referral import not_covered_text, nothing_found_text
 from askoz.answer.rewrite import QueryPlan, plan_queries
 from askoz.retrieval.search import Searcher
 
@@ -35,10 +37,7 @@ OUT_OF_SCOPE = (
     "I can only help with questions about Australian Government services and "
     "obligations, such as tax, super, Medicare and study loans."
 )
-NOTHING_FOUND = (
-    "I couldn't find official information about that in the pages I search. "
-    "Try rephrasing, or check australia.gov.au."
-)
+DIRECTORY = AGENCIES["gov_services_directory"]
 
 
 def _on_usage(config: RunnableConfig):
@@ -52,7 +51,12 @@ class AskState(TypedDict):
     pages: NotRequired[list[SourcePage]]  # retrieved candidates
     answer: NotRequired[str]
     sources: NotRequired[list[SourcePage]]  # pages actually cited
-    route: NotRequired[Literal["blocked", "out_of_scope", "nothing_found", "answered", "refused"]]
+    # Where to send the person for what AskOz can't answer (whole or part of it).
+    referral: NotRequired[Agency]
+    suggestion: NotRequired[str]  # a related question AskOz can answer
+    route: NotRequired[
+        Literal["blocked", "out_of_scope", "referral", "nothing_found", "answered", "refused"]
+    ]
 
 
 def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
@@ -77,7 +81,20 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
         query_plan = plan_queries(state["question"], on_usage=_on_usage(config))
         if not query_plan.in_scope:
             return {"plan": query_plan, "route": "out_of_scope", "answer": OUT_OF_SCOPE}
-        return {"plan": query_plan}
+        if query_plan.coverage == "covered" or query_plan.refer_to is None:
+            return {"plan": query_plan}
+        agency = AGENCIES[query_plan.refer_to]
+        if query_plan.coverage == "partly":
+            return {"plan": query_plan, "referral": agency}  # answer the ATO part, refer the rest
+        update: dict = {
+            "plan": query_plan,
+            "route": "referral",
+            "referral": agency,
+            "answer": not_covered_text(),
+        }
+        if query_plan.tax_angle_question:
+            update["suggestion"] = query_plan.tax_angle_question
+        return update
 
     def retrieve(state: AskState) -> dict:
         query_plan = state.get("plan")
@@ -85,7 +102,12 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
         queries = [state["question"], *query_plan.search_queries]
         pages = group_into_pages(ranked_chunks(searcher, queries))
         if not pages:
-            return {"pages": [], "route": "nothing_found", "answer": NOTHING_FOUND}
+            return {
+                "pages": [],
+                "route": "nothing_found",
+                "referral": DIRECTORY,
+                "answer": nothing_found_text(DIRECTORY),
+            }
         return {"pages": pages}
 
     def generate(state: AskState, config: RunnableConfig) -> dict:
@@ -95,6 +117,7 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
             state.get("pages", []),
             on_text=lambda t: write({"text": t}),
             on_usage=_on_usage(config),
+            referred_elsewhere=state.get("referral"),
         )
         return {
             "answer": answer.text,

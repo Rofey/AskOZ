@@ -7,8 +7,17 @@ export const MAX_QUESTION_CHARS = 500; // keep in step with the API's max_questi
 
 export type Source = { title: string; url: string };
 
+// Where to go for (part of) a question AskOz doesn't cover.
+export type Referral = {
+  name: string;
+  covers: string;
+  links: { label: string; url: string }[];
+  suggestion: string | null; // a related question AskOz can answer
+};
+
 export type AskHandlers = {
   onText: (text: string) => void;
+  onReferral: (referral: Referral) => void;
   onSources: (sources: Source[]) => void;
   onDone: (info: { route: string; cached: boolean }) => void;
 };
@@ -48,6 +57,7 @@ export async function ask(question: string, handlers: AskHandlers, signal: Abort
   for await (const { event, data } of readEvents(response.body)) {
     const payload = JSON.parse(data);
     if (event === "text") handlers.onText(payload.text);
+    else if (event === "referral") handlers.onReferral(payload);
     else if (event === "sources") handlers.onSources(payload);
     else if (event === "done") handlers.onDone(payload);
     else if (event === "error") throw new AskError(payload.message);

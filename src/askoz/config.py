@@ -36,10 +36,10 @@ class Settings(BaseSettings):
 
     voyage_api_key: SecretStr | None = None
     anthropic_api_key: SecretStr | None = None
-    # Claude models. Both default to the current Opus; the rewriter runs at low
-    # effort. Switch either one by env var and compare with `askoz eval`.
-    answer_model: str = "claude-opus-5-5"
-    rewrite_model: str = "claude-opus-5-5"
+    # Claude models. Both default to Haiku 5.5: ~30x cheaper than Opus 5.5 per answer,
+    # and good enough on our evals (Oct 2026). Switch by env var and re-run evals.
+    answer_model: str = "claude-haiku-5-5"
+    rewrite_model: str = "claude-haiku-5-5"
 
     # --- Abuse and cost protection (see askoz.safety) ---------------------------
     rate_limit_per_minute: int = 5  # questions per client IP

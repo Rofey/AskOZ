@@ -78,6 +78,8 @@ def main() -> None:
     evaluate.add_argument("--save-baseline", action="store_true")
     evaluate.add_argument("--check", action="store_true", help="exit 1 if worse than baseline")
     evaluate.add_argument("--show-misses", action="store_true")
+    sub.add_parser("eval-routing", help="score coverage decisions and agency referrals")
+    sub.add_parser("check-links", help="check every referral link still resolves")
     serve = sub.add_parser("serve", help="run the HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
@@ -136,6 +138,10 @@ def main() -> None:
         sys.exit(run_eval(args))
     elif args.command == "ask":
         run_ask(args.question, verbose=args.verbose)
+    elif args.command == "eval-routing":
+        sys.exit(run_eval_routing())
+    elif args.command == "check-links":
+        sys.exit(check_links())
     elif args.command == "serve":
         import uvicorn
 
@@ -176,6 +182,12 @@ def run_ask(question: str, *, verbose: bool) -> None:
         sys.exit("Couldn't reach the Claude API. Check your internet connection.")
     if not streamed:
         print(final.get("answer", ""))
+    if referral := final.get("referral"):
+        print(f"\n\nWhere to go: {referral.name} ({referral.covers})")
+        for link in referral.links:
+            print(f"    {link.label}: {link.url}")
+        if final.get("suggestion"):
+            print(f"AskOz can help with: {final['suggestion']}")
     if final.get("sources"):
         print("\n\nSources:")
         for number, page in enumerate(final["sources"], 1):
@@ -186,6 +198,51 @@ def run_ask(question: str, *, verbose: bool) -> None:
         if plan:
             print(f"search queries: {plan.search_queries}")
         print(f"pages retrieved: {[p.title for p in final.get('pages', [])]}")
+
+
+def run_eval_routing() -> int:
+    from askoz.evals.routing import load_cases, run_routing_eval
+
+    results = run_routing_eval(load_cases())
+    for r in results:
+        mark = "ok  " if r["ok"] else "MISS"
+        agency = f" -> {r['refer_to']}" if r["refer_to"] else ""
+        print(f"{mark} {r['expect']:12} got {r['got']}{agency:24} {r['question']}")
+        if r["suggestion"]:
+            print(f"     suggests: {r['suggestion']}")
+    passed = sum(r["ok"] for r in results)
+    print(f"\n{passed}/{len(results)} correct")
+    return 0 if passed == len(results) else 1
+
+
+def check_links() -> int:
+    """Request every referral URL. Some agencies block automated requests, so a
+    block is reported separately from a real failure (check those by hand)."""
+    import urllib.error
+    import urllib.request
+
+    from askoz.answer.agencies import AGENCIES
+
+    failed = 0
+    for agency in AGENCIES.values():
+        for link in agency.links:
+            request = urllib.request.Request(
+                link.url,
+                headers={"User-Agent": "AskOz link check (+https://github.com/Rofey/AskOZ)"},
+            )
+            try:
+                with urllib.request.urlopen(request, timeout=20) as response:
+                    status = f"{response.status} -> {response.url}"
+            except urllib.error.HTTPError as exc:
+                if exc.code in (401, 403):
+                    status = f"{exc.code} (blocked for bots? check by hand)"
+                else:
+                    status = f"FAILED {exc.code}"
+                    failed += 1
+            except OSError as exc:
+                status = f"no response ({type(exc).__name__}; may block bots, check by hand)"
+            print(f"{agency.id:24} {link.url:52} {status}")
+    return 1 if failed else 0
 
 
 def run_eval(args: argparse.Namespace) -> int:

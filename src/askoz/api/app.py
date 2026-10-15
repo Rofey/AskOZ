@@ -30,6 +30,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
 
+from askoz.answer.referral import referral_payload
 from askoz.config import Settings, get_settings
 from askoz.logging import configure_logging, get_logger
 from askoz.safety.cache import AnswerCache
@@ -190,8 +191,10 @@ def create_app(
 
     def _replay(cached: dict[str, Any]) -> Iterator[str]:
         yield _sse("text", {"text": cached["answer"]})
+        if cached.get("referral"):
+            yield _sse("referral", cached["referral"])
         yield _sse("sources", cached["sources"])
-        yield _sse("done", {"route": "answered", "cached": True})
+        yield _sse("done", {"route": cached.get("route", "answered"), "cached": True})
 
     def _answer(question: str, request_id: str, lease: SlotLease) -> Iterator[str]:
         """Runs in a worker thread; always releases its concurrency slot and records spend."""
@@ -214,10 +217,25 @@ def create_app(
                 yield _sse("text", {"text": final.get("answer", "")})
             sources = [{"title": p.title, "url": p.url} for p in final.get("sources", [])]
             route = final.get("route", "answered")
+            referral = (
+                referral_payload(final["referral"], final.get("suggestion"))
+                if final.get("referral")
+                else None
+            )
+            if referral:
+                yield _sse("referral", referral)
             yield _sse("sources", sources)
             yield _sse("done", {"route": route, "cached": False})
-            if route == "answered":
-                cache.set(question, {"answer": final.get("answer", ""), "sources": sources})
+            if route in ("answered", "referral"):
+                cache.set(
+                    question,
+                    {
+                        "answer": final.get("answer", ""),
+                        "sources": sources,
+                        "referral": referral,
+                        "route": route,
+                    },
+                )
         except anthropic.APIError as exc:
             log.error(
                 "claude_api_error",

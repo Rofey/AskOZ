@@ -1,0 +1,36 @@
+# Routing eval: does the planner know what AskOz covers, and where to send the rest?
+#
+# expect:   covered | partly | not_covered | out_of_scope
+# refer_to: the agency id for partly / not_covered (any of the listed ids counts)
+#
+# Questions here must not appear as examples in the planner prompt
+# (src/askoz/answer/rewrite.py), or this eval would only test copying.
+
+questions:
+  # Covered by AskOz's ATO pages
+  - {question: "do I need to lodge a tax return if I only worked a few weeks", expect: covered}
+  - {question: "what's the tax free threshold", expect: covered}
+  - {question: "how do I check my super balance from old jobs", expect: covered}
+  - {question: "is my redundancy payout taxed", expect: covered}
+  - {question: "how much HECS do I repay", expect: covered}
+  - {question: "what is the Medicare levy surcharge", expect: covered}
+
+  # Another agency's territory
+  - {question: "how do I apply for a partner visa", expect: not_covered, refer_to: [home_affairs]}
+  - {question: "how long does Australian citizenship take", expect: not_covered, refer_to: [home_affairs]}
+  - {question: "how do I renew my passport", expect: not_covered, refer_to: [passports]}
+  - {question: "how do I get a Medicare card", expect: not_covered, refer_to: [services_australia]}
+  - {question: "am I eligible for JobSeeker", expect: not_covered, refer_to: [services_australia]}
+  - {question: "what is the minimum wage in Australia", expect: not_covered, refer_to: [fair_work]}
+  - {question: "how many days of annual leave do I get", expect: not_covered, refer_to: [fair_work]}
+  - {question: "how do I get my NSW driver licence", expect: not_covered, refer_to: [state_government]}
+  - {question: "how do I register for GST for my business", expect: not_covered, refer_to: [ato_business, business_gov]}
+  - {question: "I got a text saying I owe the ATO money, is it a scam?", expect: not_covered, refer_to: [ato_scams]}
+
+  # Part ATO, part another agency
+  - {question: "how much is the age pension and do I pay tax on it", expect: partly, refer_to: [services_australia]}
+  - {question: "what's the minimum wage and how much tax comes out of it", expect: partly, refer_to: [fair_work]}
+
+  # Not about government at all
+  - {question: "write me a poem about kangaroos", expect: out_of_scope}
+  - {question: "what's a good recipe for pavlova", expect: out_of_scope}

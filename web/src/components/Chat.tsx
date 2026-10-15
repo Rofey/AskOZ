@@ -18,13 +18,15 @@ import {
   Wallet,
 } from "@/components/icons";
 import { PromptBox } from "@/components/PromptBox";
-import { ask, AskError, type Source } from "@/lib/ask";
+import { ReferralCard } from "@/components/ReferralCard";
+import { ask, AskError, type Referral, type Source } from "@/lib/ask";
 
 type Exchange = {
   id: string;
   question: string;
   answer: string;
   sources: Source[];
+  referral?: Referral;
   status: "streaming" | "done" | "error" | "stopped";
   error?: string;
 };
@@ -112,6 +114,7 @@ export function Chat() {
         question,
         {
           onText: (text) => update(id, (e) => ({ answer: e.answer + text })),
+          onReferral: (referral) => update(id, () => ({ referral })),
           onSources: (sources) => update(id, () => ({ sources })),
           onDone: () => update(id, () => ({ status: "done" })),
         },
@@ -163,10 +166,11 @@ export function Chat() {
               <button
                 type="button"
                 onClick={newConversation}
-                className="flex items-center gap-1.5 rounded-lg border border-line px-3 py-1.5 text-sm font-medium hover:bg-subtle"
+                aria-label="New question"
+                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-line px-2.5 py-1.5 text-sm font-medium hover:bg-subtle sm:px-3"
               >
                 <Plus className="h-4 w-4" />
-                New question
+                <span className="hidden sm:inline">New question</span>
               </button>
             )}
           </div>
@@ -270,6 +274,7 @@ export function Chat() {
                           </p>
                         )}
                         {e.status === "stopped" && <p className="mt-2 text-sm text-muted">Stopped.</p>}
+                        {e.referral && <ReferralCard referral={e.referral} onAsk={fillPrompt} />}
                         {e.sources.length > 0 && (
                           <section aria-label="Sources" className="mt-5">
                             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">

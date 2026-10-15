@@ -13,7 +13,7 @@ from typing import Any
 
 import redis
 
-CACHE_VERSION = "v1"  # bump when prompts or retrieval change answers materially
+CACHE_VERSION = "v3"  # bump when prompts or retrieval change answers materially
 
 
 def normalise(question: str) -> str:
