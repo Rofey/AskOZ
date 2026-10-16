@@ -33,6 +33,10 @@ questions:
   - {question: "how much does it cost to live in Melbourne as a student", expect: not_covered, refer_to: [gov_services_directory], covered_by: study_australia}
   - {question: "what should international students do in their first week here", expect: not_covered, refer_to: [gov_services_directory], covered_by: study_australia}
 
+  # Border Force and AEC (covered once they are live)
+  - {question: "can I bring cheese and chocolate into Australia", expect: not_covered, refer_to: [gov_services_directory], covered_by: abf}
+  - {question: "do I have to vote now that I am a citizen", expect: not_covered, refer_to: [gov_services_directory], covered_by: aec}
+
   # Part ATO, part another agency
   - {question: "how much is the age pension and do I pay tax on it", expect: partly, refer_to: [services_australia]}
   - {question: "what's the minimum wage and how much tax comes out of it", expect: partly, refer_to: [fair_work]}

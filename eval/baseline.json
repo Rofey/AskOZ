@@ -1,33 +1,33 @@
 {
-  "run_at": "2026-10-15T12:28:09+00:00",
+  "run_at": "2026-10-16T05:12:48+00:00",
   "query_instruction": false,
-  "questions": 95,
+  "questions": 112,
   "modes": {
     "vector": {
       "overall": {
-        "hit@1": 0.5894736842105263,
-        "hit@5": 0.8421052631578947,
-        "hit@10": 0.9157894736842105,
-        "mrr": 0.698609022556391
+        "hit@1": 0.6071428571428571,
+        "hit@5": 0.8392857142857143,
+        "hit@10": 0.9107142857142857,
+        "mrr": 0.7073022959183674
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.6,
-          "hit@5": 0.9,
-          "hit@10": 0.9,
-          "mrr": 0.7166666666666667
+          "hit@1": 0.6363636363636364,
+          "hit@5": 0.9090909090909091,
+          "hit@10": 0.9090909090909091,
+          "mrr": 0.7424242424242423
         },
         "official": {
-          "hit@1": 0.6818181818181818,
-          "hit@5": 0.9545454545454546,
+          "hit@1": 0.72,
+          "hit@5": 0.96,
           "hit@10": 1.0,
-          "mrr": 0.7905844155844156
+          "mrr": 0.8157142857142857
         },
         "plain": {
-          "hit@1": 0.5555555555555556,
-          "hit@5": 0.7936507936507936,
-          "hit@10": 0.8888888888888888,
-          "mrr": 0.6636243386243386
+          "hit@1": 0.5657894736842105,
+          "hit@5": 0.7894736842105263,
+          "hit@10": 0.881578947368421,
+          "mrr": 0.6665570175438597
         }
       },
       "ranks": {
@@ -90,7 +90,7 @@
         "student-visa-work": 1,
         "visitor-stay": 1,
         "whv-age": 1,
-        "evisitor-europe": 3,
+        "evisitor-europe": 4,
         "eta-usa": 1,
         "transit": 3,
         "post-study": 1,
@@ -125,34 +125,51 @@
         "airbnb-room": 1,
         "payg-instalments": 3,
         "business-records": 1,
-        "employer-super": 1
+        "employer-super": 1,
+        "duty-free-alcohol": 1,
+        "bring-food": 1,
+        "bring-medicine": 1,
+        "what-to-declare": 3,
+        "bring-pet": 1,
+        "passenger-card": 1,
+        "smartgate": 1,
+        "tourist-refund": null,
+        "moving-belongings": 2,
+        "new-citizen-enrol": 10,
+        "how-to-enrol": 1,
+        "update-address": null,
+        "postal-vote": 1,
+        "vote-overseas": 1,
+        "senate-ballot": 1,
+        "aec-letter": 1,
+        "silent-elector": 1
       }
     },
     "keyword": {
       "overall": {
-        "hit@1": 0.23157894736842105,
-        "hit@5": 0.5368421052631579,
-        "hit@10": 0.5789473684210527,
-        "mrr": 0.3621470342522974
+        "hit@1": 0.2767857142857143,
+        "hit@5": 0.5803571428571429,
+        "hit@10": 0.6428571428571429,
+        "mrr": 0.40526502267573694
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.3,
-          "hit@5": 0.6,
-          "hit@10": 0.6,
-          "mrr": 0.45
+          "hit@1": 0.36363636363636365,
+          "hit@5": 0.6363636363636364,
+          "hit@10": 0.6363636363636364,
+          "mrr": 0.5
         },
         "official": {
-          "hit@1": 0.18181818181818182,
-          "hit@5": 0.45454545454545453,
-          "hit@10": 0.5454545454545454,
-          "mrr": 0.3133116883116883
+          "hit@1": 0.24,
+          "hit@5": 0.48,
+          "hit@10": 0.6,
+          "mrr": 0.36142857142857143
         },
         "plain": {
-          "hit@1": 0.23809523809523808,
-          "hit@5": 0.5555555555555556,
-          "hit@10": 0.5873015873015873,
-          "mrr": 0.3652557319223986
+          "hit@1": 0.27631578947368424,
+          "hit@5": 0.6052631578947368,
+          "hit@10": 0.6578947368421053,
+          "mrr": 0.4059732664995823
         }
       },
       "ranks": {
@@ -192,7 +209,7 @@
         "phi-rebate-thresholds": 1,
         "lifetime-health-cover": null,
         "need-to-lodge": 5,
-        "first-return": null,
+        "first-return": 10,
         "free-help": null,
         "where-refund": null,
         "fix-mistake": 2,
@@ -211,7 +228,7 @@
         "hecs-repayment": null,
         "help-overseas": null,
         "help-balance": 2,
-        "bushfire": 3,
+        "bushfire": 2,
         "student-visa-work": null,
         "visitor-stay": 2,
         "whv-age": 2,
@@ -250,34 +267,51 @@
         "airbnb-room": 1,
         "payg-instalments": 1,
         "business-records": 1,
-        "employer-super": 1
+        "employer-super": 1,
+        "duty-free-alcohol": 1,
+        "bring-food": 5,
+        "bring-medicine": 1,
+        "what-to-declare": null,
+        "bring-pet": 1,
+        "passenger-card": 1,
+        "smartgate": 1,
+        "tourist-refund": 5,
+        "moving-belongings": 1,
+        "new-citizen-enrol": 5,
+        "how-to-enrol": 3,
+        "update-address": 1,
+        "postal-vote": 7,
+        "vote-overseas": 1,
+        "senate-ballot": 7,
+        "aec-letter": 1,
+        "silent-elector": 2
       }
     },
     "hybrid": {
       "overall": {
-        "hit@1": 0.43157894736842106,
-        "hit@5": 0.7789473684210526,
-        "hit@10": 0.8947368421052632,
-        "mrr": 0.5845238095238096
+        "hit@1": 0.44642857142857145,
+        "hit@5": 0.8125,
+        "hit@10": 0.9107142857142857,
+        "mrr": 0.6086982709750567
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.5,
-          "hit@5": 0.7,
-          "hit@10": 0.9,
-          "mrr": 0.6333333333333333
+          "hit@1": 0.5454545454545454,
+          "hit@5": 0.8181818181818182,
+          "hit@10": 0.9090909090909091,
+          "mrr": 0.6696969696969697
         },
         "official": {
-          "hit@1": 0.3181818181818182,
-          "hit@5": 0.7272727272727273,
-          "hit@10": 0.9545454545454546,
-          "mrr": 0.5205627705627706
+          "hit@1": 0.36,
+          "hit@5": 0.76,
+          "hit@10": 0.96,
+          "mrr": 0.5580952380952381
         },
         "plain": {
-          "hit@1": 0.4603174603174603,
-          "hit@5": 0.8095238095238095,
-          "hit@10": 0.873015873015873,
-          "mrr": 0.5991118669690099
+          "hit@1": 0.4605263157894737,
+          "hit@5": 0.8289473684210527,
+          "hit@10": 0.8947368421052632,
+          "mrr": 0.616515246449457
         }
       },
       "ranks": {
@@ -334,13 +368,13 @@
         "gic": 7,
         "dont-pay": 5,
         "hecs-repayment": null,
-        "help-overseas": 6,
-        "help-balance": 1,
+        "help-overseas": 5,
+        "help-balance": 2,
         "bushfire": 1,
         "student-visa-work": 2,
         "visitor-stay": 1,
         "whv-age": 3,
-        "evisitor-europe": 7,
+        "evisitor-europe": 9,
         "eta-usa": 1,
         "transit": 5,
         "post-study": 1,
@@ -360,7 +394,7 @@
         "change-university": 2,
         "student-work-rights": 1,
         "emergency-number": 1,
-        "student-family": 3,
+        "student-family": 2,
         "scholarships": 1,
         "first-week": 1,
         "uber-abn": 2,
@@ -375,34 +409,51 @@
         "airbnb-room": 1,
         "payg-instalments": 2,
         "business-records": 1,
-        "employer-super": 1
+        "employer-super": 1,
+        "duty-free-alcohol": 1,
+        "bring-food": 1,
+        "bring-medicine": 1,
+        "what-to-declare": 7,
+        "bring-pet": 1,
+        "passenger-card": 1,
+        "smartgate": 1,
+        "tourist-refund": 2,
+        "moving-belongings": 2,
+        "new-citizen-enrol": 1,
+        "how-to-enrol": 2,
+        "update-address": 2,
+        "postal-vote": 1,
+        "vote-overseas": 1,
+        "senate-ballot": 3,
+        "aec-letter": 1,
+        "silent-elector": 2
       }
     },
     "rerank": {
       "overall": {
-        "hit@1": 0.49473684210526314,
-        "hit@5": 0.8421052631578947,
-        "hit@10": 0.8842105263157894,
-        "mrr": 0.6290643274853801
+        "hit@1": 0.5178571428571429,
+        "hit@5": 0.8571428571428571,
+        "hit@10": 0.8928571428571429,
+        "mrr": 0.6492063492063492
       },
       "by_style": {
         "acronym": {
-          "hit@1": 0.6,
-          "hit@5": 0.9,
-          "hit@10": 0.9,
-          "mrr": 0.7083333333333333
+          "hit@1": 0.6363636363636364,
+          "hit@5": 0.9090909090909091,
+          "hit@10": 0.9090909090909091,
+          "mrr": 0.7348484848484849
         },
         "official": {
-          "hit@1": 0.5909090909090909,
-          "hit@5": 0.9545454545454546,
+          "hit@1": 0.64,
+          "hit@5": 0.96,
           "hit@10": 1.0,
-          "mrr": 0.7164141414141414
+          "mrr": 0.7504444444444445
         },
         "plain": {
-          "hit@1": 0.4444444444444444,
-          "hit@5": 0.7936507936507936,
-          "hit@10": 0.8412698412698413,
-          "mrr": 0.5859788359788359
+          "hit@1": 0.4605263157894737,
+          "hit@5": 0.8157894736842105,
+          "hit@10": 0.8552631578947368,
+          "mrr": 0.6035087719298246
         }
       },
       "ranks": {
@@ -465,14 +516,14 @@
         "student-visa-work": 2,
         "visitor-stay": 2,
         "whv-age": 1,
-        "evisitor-europe": 3,
+        "evisitor-europe": 4,
         "eta-usa": 1,
         "transit": 6,
         "post-study": 1,
         "skilled-points": 4,
         "employer-sponsor": 1,
         "partner-onshore": 1,
-        "bring-parents": 4,
+        "bring-parents": 5,
         "pr-to-citizen": 1,
         "citizenship-test": 1,
         "vevo": 2,
@@ -500,7 +551,24 @@
         "airbnb-room": 2,
         "payg-instalments": 3,
         "business-records": 1,
-        "employer-super": 1
+        "employer-super": 1,
+        "duty-free-alcohol": 1,
+        "bring-food": 2,
+        "bring-medicine": 1,
+        "what-to-declare": 4,
+        "bring-pet": 1,
+        "passenger-card": 1,
+        "smartgate": 1,
+        "tourist-refund": 2,
+        "moving-belongings": 1,
+        "new-citizen-enrol": null,
+        "how-to-enrol": 2,
+        "update-address": 1,
+        "postal-vote": 1,
+        "vote-overseas": 1,
+        "senate-ballot": 1,
+        "aec-letter": 1,
+        "silent-elector": 3
       }
     }
   }

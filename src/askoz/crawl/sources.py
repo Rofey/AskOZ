@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from typing import Literal
 from urllib.parse import urlsplit
 
+from askoz.crawl.urls import canonicalize
+
 # A year from 2000-2023 in a URL path marks archived, year-specific guidance
 # (e.g. ATO's "individual-tax-return-2019-instructions").
 ARCHIVED_YEAR = r"(?<!\d)20(?:0\d|1\d|2[0-3])(?!\d)"
@@ -40,6 +42,17 @@ class Source:
     # words that some sites put mid-sentence ("access to **fair treatment**
     # when buying..."), which precision silently deletes. Measure before changing.
     extraction: Literal["precision", "recall"] = "precision"
+    # Some servers ignore case in paths (/Voting/ and /voting/ are one page).
+    # Lowercasing stops the crawler storing duplicates.
+    lowercase_paths: bool = False
+
+    def canonical(self, url: str) -> str:
+        """The one URL we store for a page, including this site's quirks."""
+        url = canonicalize(url)
+        if self.lowercase_paths:
+            parts = urlsplit(url)
+            url = parts._replace(path=parts.path.lower()).geturl()
+        return url
 
     def allows(self, url: str) -> bool:
         parts = urlsplit(url)
@@ -111,6 +124,58 @@ SOURCES: dict[str, Source] = {
                 "courses or providers, costs of living, accommodation, student support and "
                 "safety, working while studying, and preparing to move"
             ),
+        ),
+        Source(
+            name="abf",
+            agency="Australian Border Force",
+            domain="www.abf.gov.au",
+            # SharePoint like Home Affairs (links live in navigation JSON), but
+            # page content is ordinary HTML, so no special extractor is needed.
+            start_paths=(
+                "/entering-and-leaving-australia",
+                "/entering-and-leaving-australia/can-you-bring-it-in",
+                "/entering-and-leaving-australia/duty-free",
+            ),
+            allow=(r"^/entering-and-leaving-australia(/|$)",),
+            deny=(r"/Documents/", r"\.(pdf|docx?|xlsx?)$"),
+            covers=(
+                "arriving in and leaving Australia: what you can and can't bring in, "
+                "declaring items, duty-free allowances, carrying cash, medicines and "
+                "prohibited or restricted goods, and crossing the border"
+            ),
+            topics="what you can bring into Australia",
+        ),
+        Source(
+            name="aec",
+            agency="Australian Electoral Commission",
+            domain="www.aec.gov.au",
+            start_paths=(
+                "/enrol/",
+                "/voting/",
+                "/faqs/",
+                "/news/new-citizens.htm",
+                "/assistance/",
+            ),
+            # Voter-facing parts only. Left out: parties, candidates, funding
+            # disclosure, redistributions, employment and publications.
+            allow=(
+                r"^/(enrol|enrolling_to_vote|voting|faqs|assistance)(/|$)",
+                r"^/news/new-citizens\.htm$",
+            ),
+            # enrolment_stats: hundreds of per-electorate statistics tables (257
+            # of the first 336 pages crawled); files/ and pdf/: document listings.
+            deny=(
+                r"\.(pdf|docx?|xlsx?)$",
+                r"/enrolment_stats(/|$)",
+                r"/(files|pdf)(/|$)",
+            ),
+            lowercase_paths=True,  # the server ignores case: /Voting/ == /voting/
+            covers=(
+                "enrolling to vote and keeping your enrolment up to date, who has to "
+                "enrol and vote (including new citizens), ways to vote (early, postal "
+                "and from overseas), and what happens if you don't vote"
+            ),
+            topics="enrolling to vote",
         ),
         Source(
             name="ato_business",

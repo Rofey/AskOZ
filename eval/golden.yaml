@@ -668,3 +668,110 @@ questions:
     style: plain
     relevant: [https://www.ato.gov.au/businesses-and-organisations/super-for-employers/*]
     evidence: super
+
+  # --- Travelling to and from Australia (Australian Border Force) ---------------
+  - id: duty-free-alcohol
+    question: how much alcohol can I bring into Australia duty free
+    style: plain
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/duty-free/*, https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/categories/duty-free]
+    evidence: alcohol
+
+  - id: bring-food
+    question: can I bring food from home when I fly into Australia
+    style: plain
+    # Item details live on the list page; category pages are empty shells.
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/categories/food, https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/list-of-items]
+    evidence: food
+
+  - id: bring-medicine
+    question: can I bring my prescription medicine into Australia
+    style: plain
+    # Item details live on the list page; category pages are empty shells.
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/categories/medicines-and-substances, https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/list-of-items]
+    evidence: medicine
+
+  - id: what-to-declare
+    question: what do I have to declare at the airport
+    style: plain
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/declare-it, https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/categories/goods-without-declaring]
+    evidence: declare
+
+  - id: bring-pet
+    question: can I bring my dog with me when I move to Australia
+    style: plain
+    # Item details live on the list page; category pages are empty shells.
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/categories/live-animals-and-pets, https://www.abf.gov.au/entering-and-leaving-australia/can-you-bring-it-in/list-of-items]
+    evidence: animal
+
+  - id: passenger-card
+    question: what is the incoming passenger card
+    style: official
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/crossing-the-border/at-the-border/incoming-passenger-card-(ipc)]
+    evidence: passenger card
+
+  - id: smartgate
+    question: who can use the SmartGates at the airport
+    style: official
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/smartgate/*]
+    evidence: SmartGate
+
+  - id: tourist-refund
+    question: can I get the GST back on things I bought before leaving Australia
+    style: plain
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/tourist-refund-scheme/*]
+    evidence: refund
+
+  - id: moving-belongings
+    question: I'm moving to Australia, do I pay duty on my furniture and personal belongings
+    style: plain
+    relevant: [https://www.abf.gov.au/entering-and-leaving-australia/moving-to-australia/*]
+    evidence: personal effects
+
+  # --- Enrolling and voting (Australian Electoral Commission) -------------------
+  - id: new-citizen-enrol
+    question: I just became an Australian citizen, do I have to enrol to vote
+    style: plain
+    relevant: [https://www.aec.gov.au/enrol/new-citizens.htm, https://www.aec.gov.au/faqs/enrolment.htm]
+    evidence: citizen
+
+  - id: how-to-enrol
+    question: how do I enrol to vote
+    style: plain
+    relevant: [https://www.aec.gov.au/enrol, https://www.aec.gov.au/enrol/form.htm, https://www.aec.gov.au/faqs/enrolment.htm]
+    evidence: enrol
+
+  - id: update-address
+    question: I moved house, how do I update my address on the electoral roll
+    style: plain
+    relevant: [https://www.aec.gov.au/enrol/update-my-details.htm, https://www.aec.gov.au/faqs/enrolment.htm]
+    evidence: address
+
+  - id: postal-vote
+    question: how do I get a postal vote
+    style: official
+    relevant: [https://www.aec.gov.au/faqs/postal-voting.htm, https://www.aec.gov.au/enrolling_to_vote/special_category/general-postal-voters.htm]
+    evidence: postal
+
+  - id: vote-overseas
+    question: can I vote if I'm overseas during the election
+    style: plain
+    relevant: [https://www.aec.gov.au/voting/ways_to_vote/voting-options.htm, https://www.aec.gov.au/voting/ways_to_vote]
+    evidence: overseas
+
+  - id: senate-ballot
+    question: how do I fill in the senate ballot paper
+    style: plain
+    relevant: [https://www.aec.gov.au/voting/how_to_vote/voting_senate.htm, https://www.aec.gov.au/voting/how_to_vote/practice/practice-senate.htm]
+    evidence: Senate
+
+  - id: aec-letter
+    question: why did the AEC send me a letter
+    style: acronym
+    relevant: [https://www.aec.gov.au/enrolling_to_vote/received-letter.htm, https://www.aec.gov.au/faqs/voter-information-letters.htm]
+    evidence: letter
+
+  - id: silent-elector
+    question: can I keep my address off the electoral roll for my safety
+    style: plain
+    relevant: [https://www.aec.gov.au/enrolling_to_vote/special_category/silent-electors.htm]
+    evidence: silent

@@ -256,7 +256,9 @@ export function Chat() {
               advice. Always check the linked official page, or ask a registered tax agent or the
               agency. AskOz currently covers the Department of Home Affairs (visas and
               citizenship), the Australian Taxation Office (tax and super for individuals,
-              sole traders and small businesses) and Study Australia.
+              sole traders and small businesses), the Australian Border Force (what you can
+              bring into Australia), the Australian Electoral Commission (enrolling and
+              voting) and Study Australia.
             </p>
           </section>
         </main>

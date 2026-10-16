@@ -121,6 +121,7 @@ def main() -> None:
             pages=stats.pages,
             skipped_no_content=stats.skipped_no_content,
             failed=stats.failed,
+            out_of_scope=stats.out_of_scope,
             chunks_written=stats.chunks_written,
         )
     elif args.command in ("search", "compare"):

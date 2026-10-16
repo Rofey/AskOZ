@@ -37,6 +37,11 @@ class CleanPage:
     last_updated: date | None
 
 
+# Sites on the Home Affairs SharePoint platform, which hides content in JSON.
+HOME_AFFAIRS_PORTFOLIO_HOSTS = {"immi.homeaffairs.gov.au", "www.abf.gov.au"}
+
+_SOFT_404 = re.compile(r"\b404\b|\bpage not found\b|\bsauce not found\b", re.IGNORECASE)
+
 # Accessibility skip links that sometimes survive extraction as text.
 _SKIP_LINK_LINES = {"skip to content", "skip to content or footer", "skip to main content"}
 
@@ -61,13 +66,17 @@ def tidy_markdown(text: str) -> str:
 def clean_html(html: bytes, url: str = "") -> CleanPage | None:
     """Return the page's main content as Markdown, or None if it has none."""
     schema_text, schema_title = "", ""
-    if urlsplit(url).hostname == "immi.homeaffairs.gov.au":
-        schema = home_affairs.page_schema(html.decode("utf-8", errors="replace"))
+    if urlsplit(url).hostname in HOME_AFFAIRS_PORTFOLIO_HOSTS:
+        raw = html.decode("utf-8", errors="replace")
+        schema = home_affairs.page_schema(raw)
         if schema and home_affairs.is_form(schema):
             return None  # an online form definition, not information
         if schema:
             schema_text = home_affairs.schema_to_markdown(schema)
             schema_title = str(schema.get("title") or "").strip()
+        if items := home_affairs.page_data(raw):
+            item_text = home_affairs.items_to_markdown(items)
+            schema_text = "\n\n".join(p for p in (schema_text, item_text) if p)
 
     tree = lxml.html.fromstring(html)  # bytes in, so the page's own charset is honoured
     for xpath in _NOISE_XPATHS:
@@ -75,6 +84,12 @@ def clean_html(html: bytes, url: str = "") -> CleanPage | None:
             element.drop_tree()  # unlike remove(), keeps any text that follows the element
 
     # Read title and metadata before extract(), which prunes the tree as it works.
+    # Soft 404s: some sites answer missing pages with HTTP 200 and an error page
+    # (the AEC's "404 - Sauce not found"). Never index those as content.
+    page_titles = f"{tree.xpath('normalize-space(//title)')} {tree.xpath('normalize-space(//h1)')}"
+    if _SOFT_404.search(page_titles):
+        return None
+
     metadata = trafilatura.extract_metadata(tree)
     title = (
         str(tree.xpath("normalize-space(//h1)"))

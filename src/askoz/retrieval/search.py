@@ -93,3 +93,7 @@ class Searcher:
 #   of country names that embeds poorly; "UK" vs "United Kingdom"), so the answer
 #   says it can't tell. Page-level retrieval evals can't see this: needs
 #   answer-level evals (does the answer contain the fact?).
+# - Related agencies compete: "I just became a citizen, do I have to vote?" is
+#   answered correctly from Home Affairs citizenship pages, while the AEC's own
+#   new-citizens page ranks 6th. Answers are right; the most specific source
+#   sometimes loses. Same remedy family as the perspective issue above.

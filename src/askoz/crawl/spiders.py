@@ -17,7 +17,7 @@ from scrapy.http import Response
 from scrapy.spiders import SitemapSpider
 
 from askoz.crawl.sources import Source
-from askoz.crawl.urls import canonicalize, embedded_paths
+from askoz.crawl.urls import embedded_paths
 from askoz.logging import get_logger
 
 log = get_logger(__name__)
@@ -62,7 +62,7 @@ def to_raw_page(
     response: Response, source: Source, sitemap_lastmod: datetime | None = None
 ) -> RawPage | None:
     content_type = (_header(response, "Content-Type") or "").lower()
-    url = canonicalize(response.url)
+    url = source.canonical(response.url)
     # Skip non-HTML (PDFs come later) and redirects that left our scope,
     # e.g. to a login page.
     if "text/html" not in content_type or not source.allows(url):
@@ -101,7 +101,7 @@ class SitemapSourceSpider(SitemapSpider):
 
     def sitemap_filter(self, entries: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]:
         for entry in entries:
-            url = canonicalize(entry["loc"])
+            url = self.source.canonical(entry["loc"])
             if not self.source.allows(url):
                 continue
             if lastmod := entry.get("lastmod"):
@@ -110,7 +110,9 @@ class SitemapSourceSpider(SitemapSpider):
             yield entry
 
     def parse(self, response: Response, **kwargs: Any) -> Iterator[RawPage]:
-        page = to_raw_page(response, self.source, self._lastmod.get(canonicalize(response.url)))
+        page = to_raw_page(
+            response, self.source, self._lastmod.get(self.source.canonical(response.url))
+        )
         if page:
             yield page
 
@@ -135,7 +137,7 @@ class LinkSourceSpider(scrapy.Spider):
 
         candidates = set(response.css("a::attr(href)").getall()) | embedded_paths(response.text)
         for href in candidates:
-            url = canonicalize(response.urljoin(href))
+            url = self.source.canonical(response.urljoin(href))
             if self.source.allows(url):
                 # Scrapy de-duplicates requests, so revisits are dropped for us.
                 yield scrapy.Request(url, callback=self.parse)

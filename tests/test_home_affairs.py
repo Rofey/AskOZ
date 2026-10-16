@@ -84,3 +84,31 @@ def test_fragments_with_comments_dont_crash() -> None:
     assert fragment_to_markdown("<p>Before</p><!-- x --><ul><li>item</li></ul>") == (
         "Before\n- item"
     )
+
+
+def test_border_force_item_list_becomes_one_section_per_item() -> None:
+    from askoz.ingest.sites.home_affairs import items_to_markdown, page_data
+
+    items = [
+        {
+            "title": "Medicine for personal use",
+            "indicator": "<img alt='Maybe' src='/q.png' />",
+            "description": "<p>You do not need a permit for most prescription medicines.</p>",
+            "action": "Declare it",
+            "category": "Medicine",
+        },
+        {
+            "title": "Fresh fruit",
+            "indicator": "<img alt='No' />",
+            "description": "",
+            "category": "Food and drink",
+        },
+    ]
+    value = html.escape(json.dumps(items), quote=True)
+    raw = f'<input id="ctl00_PlaceHolderMain_PageJSONDataHiddenField_Input" value="{value}"/>'
+    parsed = page_data(raw)
+    assert parsed is not None
+    text = items_to_markdown(parsed)
+    assert "## Medicine\n\n### Medicine for personal use\n\n**Can you bring it in?** Maybe" in text
+    assert "**What to do:** Declare it" in text
+    assert "### Fresh fruit\n\n**Can you bring it in?** No" in text

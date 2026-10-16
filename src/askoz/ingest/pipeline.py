@@ -59,6 +59,7 @@ class IngestStats:
     pages: int = 0
     skipped_no_content: int = 0
     failed: int = 0
+    out_of_scope: int = 0  # stored pages the source no longer includes
     chunks_written: int = 0
 
 
@@ -90,6 +91,11 @@ def load_documents(
 
     for url, page_source, blob_key in rows:
         stats.pages += 1
+        if not SOURCES[page_source].allows(url):
+            # Crawled before the source's scope was narrowed (e.g. the AEC's
+            # statistics tables). The current scope always wins.
+            stats.out_of_scope += 1
+            continue
         try:
             page = clean_html(gzip.decompress(store.get(blob_key)), url)
         except Exception:

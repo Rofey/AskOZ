@@ -148,3 +148,46 @@ def schema_to_markdown(schema: dict[str, Any]) -> str:
     seen: set[str] = set()
     unique = [p for p in parts if not (p in seen or seen.add(p))]
     return "\n\n".join(unique)
+
+
+# --- Item lists (Australian Border Force) ---------------------------------------
+# Border Force shares the Home Affairs SharePoint platform. Its "Can you bring it
+# in?" items (101 of them: food, medicines, weapons, pets...) live in a second
+# hidden field as a JSON list, rendered by JavaScript into a filterable grid. The
+# category pages themselves are empty shells.
+
+_DATA_RE = re.compile(r'id="ctl00_PlaceHolderMain_PageJSONDataHiddenField_Input"\s+value="([^"]*)"')
+_ALT_RE = re.compile(r"""alt=['"]([^'"]+)['"]""")
+
+
+def page_data(raw_html: str) -> list[dict[str, Any]] | None:
+    match = _DATA_RE.search(raw_html)
+    if not match or not match.group(1).strip():
+        return None
+    try:
+        data = json.loads(html.unescape(match.group(1)))
+    except json.JSONDecodeError:
+        return None
+    if isinstance(data, list) and all(isinstance(i, dict) and "title" in i for i in data):
+        return data
+    return None
+
+
+def items_to_markdown(items: list[dict[str, Any]]) -> str:
+    """One heading per item, grouped by category, so each item is its own chunk."""
+    by_category: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        by_category.setdefault(str(item.get("category") or "Other").strip(), []).append(item)
+    parts: list[str] = []
+    for category, entries in by_category.items():
+        parts.append(f"## {category}")
+        for item in entries:
+            parts.append(f"### {fragment_to_markdown(str(item['title']))}")
+            # The yes/no/maybe answer is an icon; its alt text carries the meaning.
+            if indicator := _ALT_RE.search(str(item.get("indicator") or "")):
+                parts.append(f"**Can you bring it in?** {indicator.group(1)}")
+            if description := fragment_to_markdown(str(item.get("description") or "")):
+                parts.append(description)
+            if action := fragment_to_markdown(str(item.get("action") or "")):
+                parts.append(f"**What to do:** {action}")
+    return "\n\n".join(parts)
