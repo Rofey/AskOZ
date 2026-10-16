@@ -23,6 +23,10 @@ def test_checksums() -> None:
         ),
         (f"medicare card {VALID_MEDICARE} expired", ["Medicare number"]),
         ("passport PA1234567 renewal", ["passport number"]),
+        ("email me at jane.citizen@example.com", ["email address"]),
+        ("call me on 0412 345 678", ["phone number"]),
+        ("my landline is (02) 9876 5432", ["phone number"]),
+        ("ring +61 412 345 678 please", ["phone number"]),
     ],
 )
 def test_finds_identifiers(text: str, expected: list[str]) -> None:
@@ -33,7 +37,8 @@ def test_finds_identifiers(text: str, expected: list[str]) -> None:
     "text",
     [
         "is $45,000 taxed at 15% for 2025-26?",
-        "call me on 0412 345 678",
+        "is 13 28 61 the right ATO number?",
+        "should I call 1800 020 504 about my visa",
         "how much HECS do I repay on 123456789 dollars",
         "what is the DASP tax rate",
     ],

@@ -20,6 +20,7 @@ import {
 import { PromptBox } from "@/components/PromptBox";
 import { ReferralCard } from "@/components/ReferralCard";
 import { ask, AskError, type Referral, type Source } from "@/lib/ask";
+import { findIdentifiers } from "@/lib/pii";
 
 type Exchange = {
   id: string;
@@ -111,7 +112,8 @@ export function Chat() {
 
   async function submit(text?: string) {
     const question = (text ?? draft).trim();
-    if (question.length < 3 || busy) return;
+    // The prompt box already blocks these; this covers every other way in.
+    if (question.length < 3 || busy || findIdentifiers(question).length > 0) return;
     const id = crypto.randomUUID();
     const controller = new AbortController();
     abortRef.current = controller;

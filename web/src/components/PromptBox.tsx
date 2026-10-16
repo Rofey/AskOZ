@@ -1,9 +1,10 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 
 import { ArrowUp, Stop } from "@/components/icons";
 import { MAX_QUESTION_CHARS } from "@/lib/ask";
+import { describeIdentifiers, findIdentifiers } from "@/lib/pii";
 
 type Props = {
   value: string;
@@ -32,7 +33,10 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
     el.style.overflowY = el.scrollHeight > 200 ? "auto" : "hidden";
   }, [value]);
 
-  const canSend = value.trim().length >= 3 && !busy;
+  // Checked as they type, so personal identifiers never leave the browser.
+  const identifiers = useMemo(() => findIdentifiers(value), [value]);
+  const hasPersonalInfo = identifiers.length > 0;
+  const canSend = value.trim().length >= 3 && !busy && !hasPersonalInfo;
   const hero = size === "hero";
 
   return (
@@ -46,9 +50,11 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
         Your question
       </label>
       <div
-        className={`flex items-end gap-2 rounded-2xl border border-line bg-white shadow-sm transition focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/10 ${
-          hero ? "p-3" : "p-2"
-        }`}
+        className={`flex items-end gap-2 rounded-2xl border bg-white shadow-sm transition focus-within:ring-4 ${
+          hasPersonalInfo
+            ? "border-warn focus-within:border-warn focus-within:ring-warn/10"
+            : "border-line focus-within:border-accent focus-within:ring-accent/10"
+        } ${hero ? "p-3" : "p-2"}`}
       >
         <textarea
           id={`question-${size}`}
@@ -65,6 +71,7 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
           rows={hero ? 2 : 1}
           placeholder={hero ? "Ask your question…" : "Ask another question…"}
           aria-describedby={`privacy-${size}`}
+          aria-invalid={hasPersonalInfo}
           className={`flex-1 resize-none bg-transparent px-2 py-1.5 leading-6 text-foreground outline-none placeholder:text-muted ${
             hero ? "text-lg" : "text-base"
           }`}
@@ -90,7 +97,17 @@ export const PromptBox = forwardRef<HTMLTextAreaElement, Props>(function PromptB
         )}
       </div>
       <p id={`privacy-${size}`} className="mt-2 flex justify-between gap-4 px-1 text-xs text-muted">
-        <span>Don&apos;t include your TFN, Medicare or passport number. Questions aren&apos;t saved.</span>
+        {hasPersonalInfo ? (
+          // role="alert" so screen readers announce it the moment it appears.
+          <span role="alert" className="font-medium text-warn">
+            Remove personal information before sending: this looks like{" "}
+            {describeIdentifiers(identifiers)}. AskOz never needs it to answer.
+          </span>
+        ) : (
+          <span>
+            Don&apos;t include your TFN, Medicare or passport number. Questions aren&apos;t saved.
+          </span>
+        )}
         <span className="tabular-nums" aria-hidden={value.length < MAX_QUESTION_CHARS - 50}>
           {value.length}/{MAX_QUESTION_CHARS}
         </span>

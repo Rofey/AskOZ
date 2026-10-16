@@ -1,15 +1,22 @@
-"""Detect Australian government identifiers before a question goes anywhere.
+"""Detect personal identifiers before a question goes anywhere.
 
-AskOz promises not to collect personal identifiers. If a question contains
-one, we stop before it reaches the LLM, the search index or the logs, and ask
-the user to rephrase. Checksums keep false positives (prices, phone numbers,
-years) low: a random 9-digit number passes the TFN checksum only 1 time in 11.
+AskOz promises not to collect personal information. The web app runs the same
+checks as you type (web/src/lib/pii.ts) so identifiers never leave the
+browser; this server-side copy is the second layer, for anything that calls
+the API directly. Keep the two in step.
+
+Checksums keep false positives (prices, years, reference numbers) low: a
+random 9-digit number passes the TFN checksum only 1 time in 11.
 """
 
 import re
 
 _DIGITS = re.compile(r"(?<![\d$])(\d[\d -]{6,13}\d)(?!\d)")
 _PASSPORT = re.compile(r"\b[A-Z]{1,2}\d{7}\b")
+_EMAIL = re.compile(r"\b[\w.+-]+@[\w-]+(\.[\w-]+)+\b")
+# Australian mobiles (04xx, or +61 4xx) and landlines with an area code (02, 03,
+# 07, 08). Not 13/1300/1800 service numbers, which people ask about.
+_PHONE = re.compile(r"(?<!\d)(?:\+?61[ -]?\(?|\(?0)[2-478]\)?(?:[ -]?\d){8}(?!\d)")
 
 _TFN_WEIGHTS = {8: (10, 7, 8, 4, 6, 3, 5, 1), 9: (1, 4, 3, 7, 5, 8, 6, 9, 10)}
 _MEDICARE_WEIGHTS = (1, 3, 7, 9, 1, 3, 7, 9)
@@ -43,4 +50,8 @@ def find_identifiers(text: str) -> list[str]:
             found.add("Medicare number")
     if _PASSPORT.search(text):
         found.add("passport number")
+    if _EMAIL.search(text):
+        found.add("email address")
+    if _PHONE.search(text):
+        found.add("phone number")
     return sorted(found)
