@@ -41,3 +41,12 @@ def coverage_note() -> str:
     agencies = list(dict.fromkeys(s.agency for s in live_sources()))
     named = agencies[0] if len(agencies) == 1 else ", ".join(agencies[:-1]) + " and " + agencies[-1]
     return f"It currently covers official information from the {named}."
+
+
+def topics_phrase() -> str:
+    """'tax and super, small business tax (ABNs and GST), visas and citizenship,
+    and studying in Australia': for greetings and "what I can help with"."""
+    topics = list(dict.fromkeys(s.topics for s in live_sources() if s.topics))
+    if len(topics) <= 2:
+        return " and ".join(topics)
+    return ", ".join(topics[:-1]) + ", and " + topics[-1]

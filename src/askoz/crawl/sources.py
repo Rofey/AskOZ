@@ -29,6 +29,9 @@ class Source:
     # What questions this source answers, in plain words. Used in the planner's
     # coverage rules and in "AskOz currently covers ..." messages.
     covers: str = ""
+    # A few words for users ("visas and citizenship"), listed in greetings and
+    # "what I can help with" messages.
+    topics: str = ""
     # The referral agency (askoz.answer.agencies) this source replaces once live:
     # its questions become answerable instead of referred.
     replaces_referral: str | None = None
@@ -75,6 +78,7 @@ SOURCES: dict[str, Source] = {
                 "travelling to and from Australia"
             ),
             replaces_referral="home_affairs",
+            topics="visas and citizenship",
         ),
         Source(
             name="services_australia",
@@ -86,6 +90,7 @@ SOURCES: dict[str, Source] = {
             min_delay=10.0,  # their robots.txt asks for Crawl-delay: 10
             covers="Centrelink payments, Medicare enrolment and cards, and Child Support",
             replaces_referral="services_australia",
+            topics="Centrelink, Medicare cards and Child Support",
         ),
         Source(
             name="study_australia",
@@ -100,6 +105,7 @@ SOURCES: dict[str, Source] = {
             deny=(r"/areas-of-study(/|$)", r"/find-a-course(/|$)", r"(?i)/agent-hub(/|$)"),
             # Precision dropped key words from 28% of the text here, junk unchanged.
             extraction="recall",
+            topics="studying in Australia",
             covers=(
                 "studying in Australia as an international student: choosing and changing "
                 "courses or providers, costs of living, accommodation, student support and "
@@ -131,6 +137,7 @@ SOURCES: dict[str, Source] = {
                 "and super for employees)"
             ),
             replaces_referral="ato_business",
+            topics="small business tax (ABNs and GST)",
         ),
         Source(
             name="ato",
@@ -145,6 +152,7 @@ SOURCES: dict[str, Source] = {
                 "levy and surcharge, private health insurance rebates on tax returns, "
                 "HELP/study loan repayments, and paying the ATO"
             ),
+            topics="tax and super",
         ),
     ]
 }

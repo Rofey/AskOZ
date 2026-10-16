@@ -31,12 +31,9 @@ from askoz.answer.generate import generate_answer
 from askoz.answer.pii import find_identifiers
 from askoz.answer.referral import not_covered_text, nothing_found_text
 from askoz.answer.rewrite import QueryPlan, plan_queries
+from askoz.answer.smalltalk import out_of_scope_text, smalltalk_reply
 from askoz.retrieval.search import Searcher
 
-OUT_OF_SCOPE = (
-    "I can only help with questions about Australian Government services and "
-    "obligations, such as tax, super, Medicare and study loans."
-)
 DIRECTORY = AGENCIES["gov_services_directory"]
 
 
@@ -65,6 +62,7 @@ class AskState(TypedDict):
         Literal[
             "blocked",
             "out_of_scope",
+            "smalltalk",
             "clarify",
             "referral",
             "nothing_found",
@@ -82,6 +80,9 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
         # identifier typed earlier must not slip through that way.
         found = find_identifiers("\n".join([*state.get("history", []), state["question"]]))
         if not found:
+            # "Hello" or "thanks": a friendly reply, no Claude call.
+            if reply := smalltalk_reply(state["question"]):
+                return {"identifiers": [], "route": "smalltalk", "answer": reply}
             return {"identifiers": []}
         kinds = " and ".join(found)
         return {
@@ -99,7 +100,7 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
             state["question"], on_usage=_on_usage(config), history=state.get("history")
         )
         if not query_plan.in_scope:
-            return {"plan": query_plan, "route": "out_of_scope", "answer": OUT_OF_SCOPE}
+            return {"plan": query_plan, "route": "out_of_scope", "answer": out_of_scope_text()}
         if query_plan.ambiguous:
             # Asking costs one planner call; guessing wrong costs a wrong answer.
             return {

@@ -88,3 +88,8 @@ class Searcher:
 #   occasional copied phrasing. Fix if needed: planner tags personal/business
 #   and retrieval softly prefers the matching section (a preference, not a
 #   filter: renting out a room is personal but lives in the business section).
+# - Right page, wrong chunk: "do I need a visa to visit from the UK?" retrieves
+#   the eVisitor and ETA pages but not their "eligible passport" chunks (a list
+#   of country names that embeds poorly; "UK" vs "United Kingdom"), so the answer
+#   says it can't tell. Page-level retrieval evals can't see this: needs
+#   answer-level evals (does the answer contain the fact?).

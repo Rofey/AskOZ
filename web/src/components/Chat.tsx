@@ -46,7 +46,7 @@ const TOPICS = [
   { icon: Plane, title: "New to Australia", text: "TFNs, residency, working holiday tax", prompt: "How do I get a tax file number if I'm on a visa?" },
   { icon: Receipt, title: "Tax returns", text: "Lodging, refunds, amendments", prompt: "How do I lodge my first tax return?" },
   { icon: PiggyBank, title: "Super", text: "Employer super, access, DASP", prompt: "When can I access my super?" },
-  { icon: HeartPulse, title: "Medicare & health cover", text: "Medicare levy and surcharge", prompt: "Do I have to pay the Medicare levy surcharge?" },
+  { icon: HeartPulse, title: "Medicare levy", text: "Levy, surcharge and the private health rebate", prompt: "Do I have to pay the Medicare levy surcharge?" },
   { icon: Briefcase, title: "Gig work & small business", text: "ABN, GST, rideshare, sole traders", prompt: "Do I need an ABN to drive for Uber?" },
 ];
 
@@ -196,8 +196,8 @@ export function Chat() {
               Government info, <span className="text-accent">in plain English</span>
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-muted text-pretty">
-              Ask about visas, citizenship, tax, super or Medicare. Answers come only from
-              official Australian Government websites, with a link to every source.
+              Ask about visas, citizenship, tax, super or running a small business. Answers come
+              only from official Australian Government websites, with a link to every source.
             </p>
             <div className="mt-8 text-left">{prompt("hero")}</div>
             <div className="mt-4 flex flex-wrap justify-center gap-2" aria-label="Example questions">
