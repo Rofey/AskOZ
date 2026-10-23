@@ -108,12 +108,30 @@ def test_forged_proxy_headers_are_ignored_by_default() -> None:
 
 
 def test_trusted_proxy_header_separates_clients() -> None:
-    client, _ = _client(trust_proxy_headers=True)
+    client, _ = _client(client_ip_source="cloudflare")
     for i in range(3):
         _ask(client, f"q {i} padding", headers={"cf-connecting-ip": "203.0.113.1"})
     assert (
         _ask(client, "q 9 padding", headers={"cf-connecting-ip": "203.0.113.2"}).status_code == 200
     )
+
+
+def test_cloud_run_uses_the_address_google_appended() -> None:
+    client, _ = _client(client_ip_source="cloud_run")
+    for i in range(3):
+        _ask(client, f"q {i} padding", headers={"x-forwarded-for": "203.0.113.1"})
+    assert (
+        _ask(client, "q 9 padding", headers={"x-forwarded-for": "203.0.113.2"}).status_code == 200
+    )
+
+
+def test_cloud_run_ignores_client_supplied_forwarded_entries() -> None:
+    client, _ = _client(client_ip_source="cloud_run")
+    # An attacker sends a fresh fake first entry each time; Google appends the real IP.
+    for i in range(3):
+        _ask(client, f"q {i} padding", headers={"x-forwarded-for": f"10.0.0.{i}, 203.0.113.1"})
+    forged = {"x-forwarded-for": "10.0.0.99, 203.0.113.1", "cf-connecting-ip": "10.0.0.98"}
+    assert _ask(client, "q 9 padding", headers=forged).status_code == 429
 
 
 def test_repeat_question_is_served_from_cache() -> None:
@@ -158,7 +176,7 @@ def test_claude_failure_becomes_error_event_and_frees_slot() -> None:
 
 def test_security_headers_and_health() -> None:
     client, _ = _client()
-    response = client.get("/healthz")
+    response = client.get("/health")
     assert response.json() == {"status": "ok"}
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-frame-options"] == "DENY"

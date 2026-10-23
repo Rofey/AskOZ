@@ -7,7 +7,13 @@ from askoz.config import Settings
 def test_env_vars_override_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("ASKOZ_DATABASE_URL", "postgresql://u:p@db.example:5432/x")
     settings = Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
-    assert settings.database_url.hosts()[0]["host"] == "db.example"
+    assert settings.database_url == "postgresql://u:p@db.example:5432/x"
+
+
+def test_unix_socket_database_url_is_accepted(monkeypatch: pytest.MonkeyPatch) -> None:
+    url = "postgresql://u:p@/x?host=/cloudsql/proj:australia-southeast1:db"
+    monkeypatch.setenv("ASKOZ_DATABASE_URL", url)
+    assert Settings(_env_file=None).database_url == url  # pyright: ignore[reportCallIssue]
 
 
 def test_invalid_database_url_fails_fast(monkeypatch: pytest.MonkeyPatch) -> None:

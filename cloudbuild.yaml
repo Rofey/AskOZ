@@ -1,0 +1,17 @@
+# How Cloud Build builds the API image:
+#   gcloud builds submit --region=australia-southeast1 --substitutions=_TAG=<tag> .
+# The image lands in Artifact Registry, ready for `gcloud run deploy`.
+substitutions:
+  _IMAGE: australia-southeast1-docker.pkg.dev/${PROJECT_ID}/askoz/api
+  _TAG: latest
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    env: ["DOCKER_BUILDKIT=1"] # the Dockerfile uses BuildKit's cache mounts
+    args: ["build", "-t", "${_IMAGE}:${_TAG}", "."]
+
+images: ["${_IMAGE}:${_TAG}"]
+
+options:
+  dynamicSubstitutions: true # lets _IMAGE use the built-in ${PROJECT_ID}
+# Default machine on purpose: its first 2,500 build-minutes a month are free.

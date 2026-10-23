@@ -1,0 +1,14 @@
+# Files `gcloud builds submit` does NOT upload to Cloud Build.
+# Same idea as .dockerignore, one step earlier: keep secrets and bulk local.
+.env
+.env.*
+.git
+.venv
+data
+web
+eval
+docs
+tests
+**/__pycache__
+.pytest_cache
+.ruff_cache

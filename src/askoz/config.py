@@ -11,8 +11,12 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import PostgresDsn, RedisDsn, SecretStr, field_validator, model_validator
+import psycopg
+from psycopg.conninfo import conninfo_to_dict
+from pydantic import RedisDsn, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+ClientIpSource = Literal["direct", "cloud_run", "cloudflare"]
 
 
 class Settings(BaseSettings):
@@ -21,7 +25,12 @@ class Settings(BaseSettings):
     env: Literal["dev", "test", "prod"] = "dev"
     log_level: str = "INFO"
 
-    database_url: PostgresDsn = PostgresDsn("postgresql://askoz:askoz@127.0.0.1:5432/askoz")
+    # A libpq URL. In prod it points at a Unix socket instead of a host:
+    # postgresql://askoz:PASSWORD@/askoz?host=/cloudsql/PROJECT:REGION:INSTANCE
+    # (Cloud Run reaches Cloud SQL through a socket it mounts at /cloudsql).
+    # Pydantic's PostgresDsn rejects URLs without a host, so this is a str
+    # checked by libpq's own parser below.
+    database_url: str = "postgresql://askoz:askoz@127.0.0.1:5432/askoz"
     redis_url: RedisDsn = RedisDsn("redis://127.0.0.1:6379/0")
 
     # Where raw crawled pages are stored. Local disk in dev; object storage in prod.
@@ -63,11 +72,26 @@ class Settings(BaseSettings):
     # Client IPs are hashed with this secret before they touch Redis or logs, so
     # we never store raw IP addresses. Required in prod.
     ip_hash_secret: SecretStr = SecretStr("dev-only-not-secret")
-    # Only trust CF-Connecting-IP / X-Forwarded-For when a proxy we control
-    # (Cloudflare, Fly.io) sets them. Otherwise anyone could fake their IP and
-    # dodge the rate limits.
-    trust_proxy_headers: bool = False
+    # Where the caller's real IP comes from. Each proxy can only vouch for what
+    # it writes itself; anything else in a header was sent by the client and
+    # could be faked to dodge the rate limits.
+    #   direct      nothing in front: the TCP peer is the client (local dev)
+    #   cloud_run   Google's front end APPENDS the client IP to X-Forwarded-For,
+    #               so only the last entry is trustworthy
+    #   cloudflare  Cloudflare overwrites CF-Connecting-IP
+    client_ip_source: ClientIpSource = "direct"
     cors_origins: list[str] = ["http://localhost:3000"]
+
+    @field_validator("database_url")
+    @classmethod
+    def _database_url_parses(cls, value: str) -> str:
+        if not value.startswith(("postgresql://", "postgres://")):
+            raise ValueError("database_url must be a postgresql:// URL")
+        try:
+            conninfo_to_dict(value)
+        except psycopg.ProgrammingError as exc:
+            raise ValueError(f"database_url is malformed: {exc}") from exc
+        return value
 
     @field_validator("crawl_contact_url", "crawl_contact_email")
     @classmethod

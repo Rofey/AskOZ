@@ -1,0 +1,19 @@
+# Keep the build context small and secrets out of the image.
+# Docker sends everything not listed here to the builder.
+.env
+.env.*
+!.env.example
+.git
+.github
+.githooks
+.venv
+data
+web
+eval
+docs
+tests
+**/__pycache__
+.pytest_cache
+.ruff_cache
+Dockerfile
+.dockerignore

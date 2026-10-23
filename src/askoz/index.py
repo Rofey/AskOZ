@@ -9,6 +9,7 @@ from typing import TypedDict
 
 from llama_index.embeddings.fastembed import FastEmbedEmbedding
 from llama_index.vector_stores.postgres import PGVectorStore
+from sqlalchemy.engine import make_url
 
 from askoz.config import get_settings
 
@@ -16,23 +17,26 @@ EMBED_MODEL = "BAAI/bge-small-en-v1.5"
 EMBED_DIM = 384
 
 
-class PgParams(TypedDict):
-    host: str
-    port: str
-    user: str
-    password: str
-    database: str
+class PgUrls(TypedDict):
+    connection_string: str
+    async_connection_string: str
 
 
-def pg_params() -> PgParams:
-    url = get_settings().database_url
-    host = url.hosts()[0]
+def pg_urls() -> PgUrls:
+    """SQLAlchemy URLs for LlamaIndex's Postgres stores, derived from DATABASE_URL.
+
+    Their `from_params(host=..., port=...)` formats a URL by hand, which breaks
+    on Unix sockets (how Cloud Run reaches Cloud SQL) and on passwords with
+    URL-special characters. Parsing and re-rendering keeps both intact.
+    """
+    url = make_url(get_settings().database_url)
+
+    def render(driver: str) -> str:
+        return url.set(drivername=driver).render_as_string(hide_password=False)
+
     return {
-        "host": host["host"] or "localhost",
-        "port": str(host["port"] or 5432),
-        "user": host["username"] or "",
-        "password": host["password"] or "",
-        "database": (url.path or "").lstrip("/"),
+        "connection_string": render("postgresql+psycopg2"),
+        "async_connection_string": render("postgresql+asyncpg"),
     }
 
 
@@ -45,7 +49,7 @@ def embed_model() -> FastEmbedEmbedding:
 
 def vector_store() -> PGVectorStore:
     return PGVectorStore.from_params(
-        **pg_params(),
+        **pg_urls(),
         table_name="chunks",  # LlamaIndex prefixes this: the table is `data_chunks`
         embed_dim=EMBED_DIM,
         hybrid_search=True,  # also maintains a tsvector column for keyword search

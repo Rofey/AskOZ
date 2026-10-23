@@ -31,7 +31,7 @@ from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
 
 from askoz.answer.referral import referral_payload
-from askoz.config import Settings, get_settings
+from askoz.config import ClientIpSource, Settings, get_settings
 from askoz.logging import configure_logging, get_logger
 from askoz.safety.cache import AnswerCache
 from askoz.safety.ratelimit import Limit, RateLimiter, hash_identity
@@ -75,13 +75,13 @@ def _sse(event: str, data: Any) -> str:
     return f"event: {event}\ndata: {json.dumps(data)}\n\n"
 
 
-def client_ip(request: Request, *, trust_proxy_headers: bool) -> str:
-    """The caller's IP. Proxy headers are only believed behind our own proxy."""
-    if trust_proxy_headers:
-        if cf_ip := request.headers.get("cf-connecting-ip"):
-            return cf_ip.strip()
-        if forwarded := request.headers.get("x-forwarded-for"):
-            return forwarded.split(",")[0].strip()  # the client, as seen by the first proxy
+def client_ip(request: Request, *, source: ClientIpSource) -> str:
+    """The caller's IP, read only from where our own proxy puts it (see Settings)."""
+    if source == "cloudflare" and (cf_ip := request.headers.get("cf-connecting-ip")):
+        return cf_ip.strip()
+    if source == "cloud_run" and (forwarded := request.headers.get("x-forwarded-for")):
+        # "spoofed, spoofed, real": Google appends the address it saw last.
+        return forwarded.split(",")[-1].strip()
     return request.client.host if request.client else "unknown"
 
 
@@ -153,8 +153,8 @@ def create_app(
             default_factory=list, max_length=3
         )
 
-    @app.get("/healthz")
-    def healthz() -> dict[str, str]:
+    @app.get("/health")  # not /healthz: Cloud Run reserves paths ending in "z"
+    def health() -> dict[str, str]:
         return {"status": "ok"}
 
     @app.exception_handler(HTTPException)
@@ -164,7 +164,7 @@ def create_app(
     @app.post("/v1/ask")
     def ask(body: AskRequest, request: Request) -> StreamingResponse:
         request_id = uuid.uuid4().hex[:12]
-        ip = client_ip(request, trust_proxy_headers=settings.trust_proxy_headers)
+        ip = client_ip(request, source=settings.client_ip_source)
         identity = hash_identity(ip, settings.ip_hash_secret.get_secret_value())
 
         decision = limiter.hit(identity)

@@ -1,5 +1,5 @@
 # Local development services. Production uses managed equivalents
-# (Neon/Supabase Postgres in Sydney, Upstash Redis) with the same interfaces.
+# (Cloud SQL Postgres in Sydney, Upstash Redis) with the same interfaces.
 services:
   postgres:
     # Official Postgres 17 image with the pgvector extension pre-built.

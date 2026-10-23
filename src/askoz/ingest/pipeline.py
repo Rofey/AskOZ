@@ -28,12 +28,13 @@ from llama_index.core import Document
 from llama_index.core.ingestion import DocstoreStrategy, IngestionPipeline
 from llama_index.core.node_parser import MarkdownNodeParser, SentenceSplitter
 from llama_index.storage.docstore.postgres import PostgresDocumentStore
+from llama_index.storage.kvstore.postgres import PostgresKVStore
 from psycopg import sql
 
 from askoz.config import get_settings
 from askoz.crawl.sources import SOURCES
 from askoz.db import connect
-from askoz.index import embed_model, pg_params, vector_store
+from askoz.index import embed_model, pg_urls, vector_store
 from askoz.ingest.clean import clean_html
 from askoz.ingest.transforms import MergeSmallSections
 from askoz.logging import get_logger
@@ -71,7 +72,9 @@ def build_pipeline() -> IngestionPipeline:
             SentenceSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP),
             embed_model(),
         ],
-        docstore=PostgresDocumentStore.from_params(**pg_params(), table_name="docstore"),
+        docstore=PostgresDocumentStore(
+            PostgresKVStore.from_params(**pg_urls(), table_name="docstore")
+        ),
         vector_store=vector_store(),
         docstore_strategy=DocstoreStrategy.UPSERTS,
     )
