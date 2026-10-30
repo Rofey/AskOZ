@@ -57,7 +57,12 @@ def vector_store() -> PGVectorStore:
         hnsw_kwargs={
             "hnsw_m": 16,
             "hnsw_ef_construction": 64,
-            "hnsw_ef_search": 40,
+            # How widely each search explores the graph. At 40 (pgvector's
+            # default), recall@20 vs exact search was 0.94 on the golden set and
+            # some right pages vanished outright (bge vectors sit close together,
+            # which makes approximate search harder). 200 gave 1.00 at 1.6 ms
+            # per query instead of 1.1 ms. Measured Oct 2026, 29k chunks.
+            "hnsw_ef_search": 200,
             "hnsw_dist_method": "vector_cosine_ops",
         },
     )

@@ -90,9 +90,12 @@ AskOz can't answer, chosen from this list; null when "covered":
 {directory}
 
 `search_queries`: 1 to 3 queries for the covered part, in the terminology \
-official pages use. Expand slang and abbreviations, e.g. "the dole" -> \
-"JobSeeker Payment", "PAYG" -> "pay as you go withholding". The first query \
-restates the question faithfully. For "not_covered", give the restated question only.
+official pages use. Translate everyday words into official terms, e.g. "the \
+dole" -> "JobSeeker Payment", "uni fees loan" -> "HELP debt". Official pages \
+often use abbreviations in their own titles and text (TFN, ABN, GST, PAYG), so \
+when a term has a common abbreviation, use the abbreviation in one query and \
+the full name in another. The first query restates the question faithfully. \
+For "not_covered", give the restated question only.
 
 `related_question`: only for "not_covered", and only if there is a genuine \
 related question AskOz's coverage could answer that the person would likely \

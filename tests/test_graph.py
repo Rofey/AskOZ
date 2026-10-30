@@ -57,8 +57,7 @@ def stubs(monkeypatch: pytest.MonkeyPatch) -> dict[str, list[Any]]:
 
     monkeypatch.setattr(graph_module, "plan_queries", plan)
     monkeypatch.setattr(graph_module, "generate_answer", generate)
-    monkeypatch.setattr(graph_module, "ranked_chunks", lambda searcher, queries: [])
-    monkeypatch.setattr(graph_module, "group_into_pages", lambda chunks: [PAGE])
+    monkeypatch.setattr(graph_module, "retrieve_pages", lambda searcher, queries: [PAGE])
     return calls
 
 

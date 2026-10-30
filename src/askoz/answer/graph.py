@@ -26,7 +26,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
 from askoz.answer.agencies import AGENCIES, Agency
-from askoz.answer.context import SourcePage, group_into_pages, ranked_chunks
+from askoz.answer.context import SourcePage, retrieve_pages
 from askoz.answer.generate import generate_answer
 from askoz.answer.pii import find_identifiers
 from askoz.answer.referral import not_covered_text, nothing_found_text
@@ -130,7 +130,7 @@ def build_graph(searcher: Searcher | None = None) -> CompiledStateGraph:
         # The standalone form carries context from the history ("my assessment"
         # -> "my skills assessment for the 189 visa").
         queries = [query_plan.standalone_question, *query_plan.search_queries]
-        pages = group_into_pages(ranked_chunks(searcher, queries))
+        pages = retrieve_pages(searcher, queries)
         if not pages:
             return {
                 "pages": [],

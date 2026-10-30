@@ -119,12 +119,10 @@ def cached_plan(question: str) -> list[str]:
 
 def ranked_pages(searcher: Searcher, question: str, mode: EvalMode) -> list[str]:
     if mode == "rewrite":
-        from askoz.answer.context import group_into_pages, ranked_chunks
+        from askoz.answer.context import retrieve_pages
 
         queries = [question, *cached_plan(question)]
-        return [
-            p.url for p in group_into_pages(ranked_chunks(searcher, queries), max_pages=MAX_RANK)
-        ]
+        return [p.url for p in retrieve_pages(searcher, queries, max_pages=MAX_RANK)]
 
     pages: list[str] = []
     for result in searcher.search(question, mode=mode, top_k=CHUNKS_FETCHED):

@@ -94,6 +94,15 @@ questions:
     relevant: [tax-file-number/apply-for-a-tfn/foreign-passport-holders-permanent-migrants-and-temporary-visitors-tfn-application]
     evidence: visa
 
+  # Same need, spelled out. The page says "TFN" throughout, and the spelled-out
+  # form plus "visa" pulled in tax-return and Home Affairs visa pages instead.
+  # (Also a sample question on the website: keep the two in step.)
+  - id: tfn-visa-holder-spelled-out
+    question: How do I get a tax file number if I'm on a visa?
+    style: plain
+    relevant: [tax-file-number/apply-for-a-tfn/foreign-passport-holders-permanent-migrants-and-temporary-visitors-tfn-application]
+    evidence: work rights visa
+
   - id: tfn-citizen
     question: how do I apply for a tax file number as an Australian citizen
     style: official
