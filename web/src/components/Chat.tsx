@@ -17,6 +17,7 @@ import {
   Receipt,
   ShieldCheck,
 } from "@/components/icons";
+import { LegalLinks } from "@/components/LegalPage";
 import { PromptBox } from "@/components/PromptBox";
 import { ReferralCard } from "@/components/ReferralCard";
 import { ask, AskError, type Referral, type Source } from "@/lib/ask";
@@ -250,16 +251,13 @@ export function Chat() {
                 </li>
               ))}
             </ul>
-            <p className="mx-auto max-w-5xl px-4 pb-8 text-xs leading-5 text-muted">
+            <p className="mx-auto max-w-5xl px-4 pb-3 text-xs leading-5 text-muted">
               AskOz is an independent service, not affiliated with or endorsed by the Australian
               Government. It gives general information only, not financial, tax, legal or migration
               advice. Always check the linked official page, or ask a registered tax agent or the
-              agency. AskOz currently covers the Department of Home Affairs (visas and
-              citizenship), the Australian Taxation Office (tax and super for individuals,
-              sole traders and small businesses), the Australian Border Force (what you can
-              bring into Australia), the Australian Electoral Commission (enrolling and
-              voting) and Study Australia.
+              agency.
             </p>
+            <LegalLinks />
           </section>
         </main>
       ) : (
