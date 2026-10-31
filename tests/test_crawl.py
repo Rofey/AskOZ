@@ -57,6 +57,23 @@ def test_home_affairs_scope() -> None:
     assert not ha.allows("https://immi.homeaffairs.gov.au/visas/Documents/form.pdf")
 
 
+def test_mygov_scope_skips_translations_and_account_screens() -> None:
+    mygov = SOURCES["mygov"]
+    assert mygov.allows("https://my.gov.au/en/about/help/digital-id/sign-in-with-digital-id")
+    assert mygov.allows("https://my.gov.au/en/services/work/recently-unemployed")
+    assert not mygov.allows("https://my.gov.au/en/languages/vietnamese")
+    assert not mygov.allows("https://my.gov.au/en/myaccount/settings")
+
+
+def test_business_gov_scope_skips_grant_listings() -> None:
+    biz = SOURCES["business_gov"]
+    assert biz.allows("https://business.gov.au/registrations/register-your-business-name")
+    assert biz.allows("https://business.gov.au/people/contractors/employee-or-contractor")
+    assert not biz.allows("https://business.gov.au/grants-and-programs/industry-growth-program")
+    assert not biz.allows("https://business.gov.au/expertise-and-advice/pyrenees-shire-council")
+    assert not biz.allows("https://business.gov.au/news/anything")
+
+
 def test_blob_store_round_trip_and_rejects_path_escape(tmp_path: Path) -> None:
     store = LocalBlobStore(tmp_path)
     store.put("raw/a/b.gz", b"hello")

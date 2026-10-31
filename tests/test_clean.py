@@ -76,3 +76,28 @@ def test_case_insensitive_sites_get_one_url_per_page() -> None:
     )
     assert aec.allows(aec.canonical("https://www.aec.gov.au/Enrolling_to_vote/Special_Category/"))
     assert not aec.allows(aec.canonical("https://www.aec.gov.au/Parties_and_Representatives/x"))
+
+
+# Collapsible sections: business.gov.au puts the title in a <button> inside the
+# heading; myGov puts it in an attribute of a custom element.
+ACCORDIONS = b"""<!doctype html><html><head><meta charset="utf-8"><title>Fees</title></head>
+<body><main><article>
+  <h1>Register your business name</h1>
+  <p>A business name is the name your business trades under. You register it with ASIC.</p>
+  <div class="accordion-item">
+    <h3><button type="button"><span>The cost for a business name</span></button></h3>
+    <div class="collapse"><p>The fees are $47 for 1 year or $108 for 3 years.</p></div>
+  </div>
+  <gui-accordion-item heading-text="Linking code">
+    <div class="accordion-inner-cmp"><p>You need a linking code from a Service Officer
+       before you can link this way.</p></div>
+  </gui-accordion-item>
+</article></main></body></html>"""
+
+
+def test_keeps_accordion_titles() -> None:
+    page = clean_html(ACCORDIONS)
+    assert page is not None
+    assert "### The cost for a business name" in page.text
+    assert "### Linking code" in page.text
+    assert page.text.count("# Register your business name") == 1

@@ -1,6 +1,6 @@
 from llama_index.core.schema import NodeWithScore, TextNode
 
-from askoz.answer.context import fuse_pages, pages_from_results
+from askoz.answer.context import SourcePage, complete_sections, fuse_pages, pages_from_results
 
 
 def _chunk(url: str, text: str) -> NodeWithScore:
@@ -43,3 +43,34 @@ def test_agreement_ranks_first_but_every_querys_top_page_gets_a_slot() -> None:
     fused = fuse_pages(lists, slots=5)
     assert fused[0] == "https://x/common-0"
     assert "https://x/right" in fused[:5]
+
+
+MEDICARE = [
+    ("/Link Medicare/", "# Link Medicare"),
+    ("/Link Medicare/", "## How to link: there are 3 ways"),
+    ("/Link Medicare/How to link/", "### Digital ID"),
+    ("/Link Medicare/How to link/", "### Medicare card"),
+    ("/Link Medicare/How to link/", "### Linking code"),
+]
+
+
+def test_a_small_section_is_completed_in_page_order() -> None:
+    page = SourcePage(url="https://x/m", title="Link Medicare", last_updated=None)
+    page.sections = ["### Linking code", "### Digital ID"]  # as search ranked them
+    complete_sections([page], {"https://x/m": MEDICARE})
+    assert page.sections == ["### Digital ID", "### Medicare card", "### Linking code"]
+
+
+def test_sections_are_left_alone_when_the_page_would_grow_too_big() -> None:
+    chunks = [("/Big/", f"part {i}") for i in range(8)]
+    page = SourcePage(url="https://x/big", title="Big", last_updated=None)
+    page.sections = ["part 5"]
+    complete_sections([page], {"https://x/big": chunks})
+    assert page.sections == ["part 5"]
+
+
+def test_sections_are_left_alone_when_the_index_changed() -> None:
+    page = SourcePage(url="https://x/m", title="Link Medicare", last_updated=None)
+    page.sections = ["text that is no longer indexed"]
+    complete_sections([page], {"https://x/m": MEDICARE})
+    assert page.sections == ["text that is no longer indexed"]

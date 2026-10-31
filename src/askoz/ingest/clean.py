@@ -24,6 +24,9 @@ _NOISE_XPATHS = (
     f"//a[{_CLASS.format('anchor')} and not(normalize-space())]",
     "//span[normalize-space() = 'External Link']",
     f"//*[{_CLASS.format('sr-only')} or {_CLASS.format('visually-hidden')}]",
+    # business.gov.au's cookie notice and "Read next" link cards, which recall
+    # extraction would otherwise keep.
+    f"//*[{_CLASS.format('toast-cookie')} or {_CLASS.format('inline-cta-container')}]",
 )
 
 # Pages with less body text than this are hubs or link lists, not answers.
@@ -63,6 +66,24 @@ def tidy_markdown(text: str) -> str:
     return "\n".join(lines).strip()
 
 
+def restore_accordion_headings(tree: lxml.html.HtmlElement) -> None:
+    """Keep the titles of collapsible sections, which extraction otherwise loses.
+
+    Without them, sections like "Digital ID", "Medicare card" and "Linking code"
+    run together as unlabelled step lists, and answers mix the steps up.
+    """
+    # business.gov.au: <h3><button>The cost for a business name</button></h3>.
+    # Trafilatura drops buttons, so keep the button's text and lose the tag.
+    for button in tree.xpath("//*[self::h2 or self::h3 or self::h4]//button"):
+        button.drop_tag()
+    # myGov: the title is an attribute of a custom element, <gui-accordion-item
+    # heading-text="Digital ID">, so there's no text to extract at all.
+    for item in tree.xpath("//*[@heading-text]"):
+        heading = lxml.html.Element("h3")
+        heading.text = item.get("heading-text")
+        item.insert(0, heading)
+
+
 def clean_html(html: bytes, url: str = "") -> CleanPage | None:
     """Return the page's main content as Markdown, or None if it has none."""
     schema_text, schema_title = "", ""
@@ -82,6 +103,7 @@ def clean_html(html: bytes, url: str = "") -> CleanPage | None:
     for xpath in _NOISE_XPATHS:
         for element in tree.xpath(xpath):
             element.drop_tree()  # unlike remove(), keeps any text that follows the element
+    restore_accordion_headings(tree)
 
     # Read title and metadata before extract(), which prunes the tree as it works.
     # Soft 404s: some sites answer missing pages with HTTP 200 and an error page
@@ -110,6 +132,8 @@ def clean_html(html: bytes, url: str = "") -> CleanPage | None:
         favor_recall=recall,
     )
     body = tidy_markdown("\n\n".join(part for part in (html_body, schema_text) if part))
+    # Recall extraction keeps the page's own <h1>; we add the title ourselves.
+    body = body.removeprefix(f"# {title}").lstrip()
     if not body or len(body) < MIN_BODY_CHARS or not title:
         return None
 

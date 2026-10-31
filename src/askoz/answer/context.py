@@ -16,18 +16,29 @@ How the lists are merged, measured on the golden set over two planner runs
   buried the one right page. Majority agreement is a good default, not a veto.
 
 hit@1 0.58 -> 0.65 and MRR 0.72 -> 0.76 on average; hit@5 unchanged (0.93).
+
+Then each page's chunks are completed by section (complete_sections): myGov's
+"There are 3 ways to link Medicare" is three chunks, and only the two that
+matched the question's words were sent, so answers said there were two ways.
 """
 
+from collections import Counter
 from dataclasses import dataclass, field
 
 from llama_index.core.schema import NodeWithScore
 
+from askoz.db import connect
 from askoz.retrieval.search import Searcher
 from askoz.retrieval.vocabulary import with_abbreviations
 
 MAX_PAGES = 5
-MAX_CHUNKS_PER_PAGE = 3
+MAX_CHUNKS_PER_PAGE = 3  # best-matching chunks taken from each page
+MAX_SECTION_CHUNKS = 3  # a section this small is sent whole
+MAX_PAGE_CHUNKS = 5  # per page, after completing sections
 CANDIDATES_PER_QUERY = 20
+
+# url -> the page's chunks in page order, as (header_path, text)
+PageChunks = dict[str, list[tuple[str, str]]]
 PAGE_RRF_K = 10
 
 
@@ -55,7 +66,47 @@ def retrieve_pages(
         searcher.search(q, mode="vector", top_k=CANDIDATES_PER_QUERY)
         for q in with_abbreviations(queries)
     ]
-    return pages_from_results(lists, max_pages=max_pages)
+    pages = pages_from_results(lists, max_pages=max_pages)
+    complete_sections(pages, fetch_page_chunks([p.url for p in pages]))
+    return pages
+
+
+def fetch_page_chunks(urls: list[str]) -> PageChunks:
+    """Every chunk of these pages, in page order (chunks are inserted in order)."""
+    out: PageChunks = {url: [] for url in urls}
+    with connect() as conn:
+        rows = conn.execute(
+            "SELECT metadata_->>'ref_doc_id', metadata_->>'header_path', text"
+            " FROM data_chunks WHERE metadata_->>'ref_doc_id' = ANY(%s) ORDER BY id",
+            (urls,),
+        ).fetchall()
+    for url, header_path, text in rows:
+        out[url].append((header_path or "", text))
+    return out
+
+
+def complete_sections(pages: list[SourcePage], page_chunks: PageChunks) -> None:
+    """Add the rest of each small section a chosen chunk belongs to, in page order.
+
+    Search picks chunks by their words, so a section split into chunks ("there
+    are 3 ways": Digital ID, Medicare card, linking code) can arrive with a
+    part missing, and the answer then leaves it out. Large sections and pages
+    that would grow past MAX_PAGE_CHUNKS are left as search chose them.
+    """
+    for page in pages:
+        chunks = page_chunks.get(page.url, [])
+        chosen = set(page.sections)
+        if not chosen <= {text for _, text in chunks}:
+            continue  # index changed since the search; keep what we have
+        sizes = Counter(path for path, _ in chunks)
+        paths = {path for path, text in chunks if text in chosen}
+        keep = [
+            text
+            for path, text in chunks
+            if text in chosen or (path in paths and sizes[path] <= MAX_SECTION_CHUNKS)
+        ]
+        if len(keep) <= MAX_PAGE_CHUNKS:
+            page.sections = keep
 
 
 def fuse_pages(page_lists: list[list[str]], *, slots: int, k: int = PAGE_RRF_K) -> list[str]:

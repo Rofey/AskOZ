@@ -22,15 +22,16 @@ class RoutingCase(BaseModel):
     expect: Expected
     refer_to: list[str] = []
     covered_by: str | None = None  # once this source is live, expect "covered"
+    also_ok: list[Expected] = []  # equally right once covered_by is live
     history: list[str] = []  # earlier questions in the conversation
     # For follow-ups: the standalone rewrite must mention one of these words,
     # i.e. the history was actually used to resolve the question.
     standalone_mentions: list[str] = []
 
-    def expected_now(self) -> tuple[Expected, list[str]]:
+    def expected_now(self) -> tuple[list[Expected], list[str]]:
         if self.covered_by and self.covered_by in get_settings().live_sources:
-            return "covered", []
-        return self.expect, self.refer_to
+            return ["covered", *self.also_ok], []
+        return [self.expect], self.refer_to
 
 
 def load_cases(path: Path = ROUTING_PATH) -> list[RoutingCase]:
@@ -42,7 +43,7 @@ def run_routing_eval(cases: list[RoutingCase]) -> list[dict]:
     results = []
     for case in cases:
         plan = plan_queries(case.question, history=case.history)
-        expect, refer_to = case.expected_now()
+        accepted, refer_to = case.expected_now()
         got: Expected
         if not plan.in_scope:
             got = "out_of_scope"
@@ -50,7 +51,7 @@ def run_routing_eval(cases: list[RoutingCase]) -> list[dict]:
             got = "clarify"
         else:
             got = plan.coverage
-        agency_ok = expect == "clarify" or not refer_to or plan.refer_to in refer_to
+        agency_ok = "clarify" in accepted or not refer_to or plan.refer_to in refer_to
         resolved_ok = not case.standalone_mentions or any(
             word.lower() in plan.standalone_question.lower() for word in case.standalone_mentions
         )
@@ -58,10 +59,10 @@ def run_routing_eval(cases: list[RoutingCase]) -> list[dict]:
             {
                 "question": case.question,
                 "history": case.history,
-                "expect": expect,
+                "expect": "|".join(accepted),
                 "got": got,
                 "refer_to": plan.refer_to,
-                "ok": got == expect and agency_ok and resolved_ok,
+                "ok": got in accepted and agency_ok and resolved_ok,
                 "suggestion": plan.related_question,
                 "standalone": plan.standalone_question,
                 "options": plan.interpretations,

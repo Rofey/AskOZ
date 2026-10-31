@@ -100,6 +100,16 @@ export const Passport = (p: IconProps) => (
     <path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6zM9 17h6M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
   </Svg>
 );
+export const IdCard = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 6h18v12H3zM13 10h5M13 14h3M8 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM5 16a3 3 0 0 1 6 0" />
+  </Svg>
+);
+export const Store = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 10v10h16V10M3 10l2-6h14l2 6zM3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M10 20v-5h4v5" />
+  </Svg>
+);
 export const Briefcase = (p: IconProps) => (
   <Svg {...p}>
     <path d="M4 8h16v11H4zM9 8V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M4 13h16" />

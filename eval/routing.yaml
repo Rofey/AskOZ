@@ -3,6 +3,8 @@
 # expect:   covered | partly | not_covered | out_of_scope
 # refer_to: the agency id for partly / not_covered (any of the listed ids counts)
 # covered_by: a source that, once live, makes this question "covered" instead
+# also_ok: other results that are equally right once covered_by is live (e.g.
+#   "partly": answered from myGov, with a link to Services Australia for amounts)
 #
 # Questions here must not appear as examples in the planner prompt
 # (src/askoz/answer/rewrite.py), or this eval would only test copying.
@@ -21,7 +23,8 @@ questions:
   - {question: "how long does Australian citizenship take", expect: not_covered, refer_to: [home_affairs], covered_by: home_affairs}
   - {question: "how do I renew my passport", expect: not_covered, refer_to: [passports]}
   - {question: "how do I get a Medicare card", expect: not_covered, refer_to: [services_australia]}
-  - {question: "am I eligible for JobSeeker", expect: not_covered, refer_to: [services_australia]}
+  - {question: "am I eligible for JobSeeker", expect: not_covered, refer_to: [services_australia], covered_by: mygov, also_ok: [partly]}
+  - {question: "how much is JobSeeker per fortnight", expect: not_covered, refer_to: [services_australia]}
   - {question: "what is the minimum wage in Australia", expect: not_covered, refer_to: [fair_work]}
   - {question: "how many days of annual leave do I get", expect: not_covered, refer_to: [fair_work]}
   - {question: "how do I get my NSW driver licence", expect: not_covered, refer_to: [state_government]}
@@ -36,6 +39,12 @@ questions:
   # Border Force and AEC (covered once they are live)
   - {question: "can I bring cheese and chocolate into Australia", expect: not_covered, refer_to: [gov_services_directory], covered_by: abf}
   - {question: "do I have to vote now that I am a citizen", expect: not_covered, refer_to: [gov_services_directory], covered_by: aec}
+
+  # myGov and business.gov.au (covered once they are live)
+  - {question: "how do I link Centrelink to my myGov account", expect: not_covered, refer_to: [my_gov], covered_by: mygov}
+  - {question: "I'm having a baby, what help can I get from the government", expect: not_covered, refer_to: [services_australia, gov_services_directory], covered_by: mygov, also_ok: [partly]}
+  - {question: "how much does it cost to register a business name", expect: not_covered, refer_to: [business_gov], covered_by: business_gov}
+  - {question: "what licences do I need to open a cafe", expect: not_covered, refer_to: [business_gov, state_government], covered_by: business_gov}
 
   # Part ATO, part another agency
   - {question: "how much is the age pension and do I pay tax on it", expect: partly, refer_to: [services_australia]}

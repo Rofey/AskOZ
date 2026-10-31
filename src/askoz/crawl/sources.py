@@ -219,6 +219,55 @@ SOURCES: dict[str, Source] = {
             ),
             topics="tax and super",
         ),
+        Source(
+            name="mygov",
+            agency="myGov",
+            domain="my.gov.au",
+            sitemap_url="https://my.gov.au/sitemap.xml",
+            # Help with the account itself, and the life-event guides ("having a
+            # baby", "recently unemployed") that explain Centrelink, Medicare and
+            # other services in plain words. Left out: translated pages (the index
+            # is English only) and signed-in account screens.
+            allow=(r"^/en/about/(help|privacy-and-security)(/|$)", r"^/en/services/"),
+            covers=(
+                "myGov accounts (creating one, signing in, linking Centrelink, Medicare, "
+                "the ATO and other services, Digital ID and staying secure), and myGov's "
+                "guides to government help at life events (having a baby, raising kids, "
+                "separating, looking for work or becoming unemployed, studying, housing, "
+                "health, disability and ageing). These guides explain who can get "
+                "Centrelink payments such as JobSeeker Payment, Youth Allowance, Parental "
+                "Leave Pay, Family Tax Benefit and Child Care Subsidy, and how to claim "
+                "them, but not payment amounts, which are on Services Australia's site"
+            ),
+            replaces_referral="my_gov",
+            topics="myGov and help at life events",
+        ),
+        Source(
+            name="business_gov",
+            agency="business.gov.au",
+            domain="business.gov.au",
+            sitemap_url="https://business.gov.au/sitemap.xml",
+            # Guidance for starting and running a business. Left out: the ~700
+            # individual grant listings (rounds open and close, so an answer could
+            # quote a closed one), the directory of local advisers, events and news.
+            allow=(
+                r"^/(planning|registrations|finance|people|legal|risk-management"
+                r"|products-and-services|online-and-digital|marketing-and-advertising"
+                r"|operations|environmental-management|exiting|guide|grants-and-support"
+                r")(/|$)",
+            ),
+            # Fees and other key details sit in accordions, which precision drops.
+            extraction="recall",
+            covers=(
+                "starting and running a business: choosing a structure, registering a "
+                "business name, ABN or company, licences and permits, business plans, "
+                "finance, hiring staff and contractors, fair trading and consumer law "
+                "for businesses, cyber security, insurance, disputes, and selling or "
+                "closing a business"
+            ),
+            replaces_referral="business_gov",
+            topics="starting and running a business",
+        ),
     ]
 }
 

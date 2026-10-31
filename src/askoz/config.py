@@ -58,6 +58,8 @@ class Settings(BaseSettings):
         "study_australia",
         "abf",
         "aec",
+        "mygov",
+        "business_gov",
     ]
 
     # --- Abuse and cost protection (see askoz.safety) ---------------------------

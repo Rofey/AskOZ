@@ -784,3 +784,123 @@ questions:
     style: plain
     relevant: [https://www.aec.gov.au/enrolling_to_vote/special_category/silent-electors.htm]
     evidence: silent
+
+  # --- myGov -------------------------------------------------------------------
+  - id: mygov-link-centrelink
+    question: how do I link Centrelink to my myGov account
+    style: official
+    relevant: [https://my.gov.au/en/about/help/mygov-website/link-services-to-your-account/link-centrelink]
+    evidence: Centrelink
+
+  - id: mygov-create-account
+    question: how do I make a myGov account
+    style: plain
+    relevant:
+      - https://my.gov.au/en/about/help/mygov-website/create-mygov-account
+      - https://my.gov.au/en/about/help/mygov-website/create-mygov-account/detailed-steps-on-how-to-create-a-mygov-account
+    evidence: email
+
+  - id: mygov-digital-id
+    question: can I sign in to myGov with my Digital ID
+    style: official
+    relevant:
+      - https://my.gov.au/en/about/help/digital-id/sign-in-with-digital-id
+      - https://my.gov.au/en/about/help/digital-id/connect-your-digital-id
+    evidence: Digital ID
+
+  - id: mygov-passkey
+    question: what is a passkey and how do I use one for myGov
+    style: official
+    relevant: [https://my.gov.au/en/about/help/mygov-website/sign-in-to-mygov/use-passkeys]
+    evidence: passkey
+
+  - id: mygov-scam-email
+    question: I got an email saying it's from myGov with a link, is it a scam?
+    style: plain
+    relevant:
+      - https://my.gov.au/en/about/privacy-and-security/security/mygov-scams/how-to-spot-a-mygov-scam
+      - https://my.gov.au/en/about/privacy-and-security/security/mygov-scams
+    evidence: link
+
+  - id: mygov-lost-job
+    question: I just lost my job, what payments can I get?
+    style: plain
+    relevant:
+      - https://my.gov.au/en/services/work/recently-unemployed/payments-to-help-if-you-re-unemployed
+      - https://my.gov.au/en/services/work/recently-unemployed/payments-to-help-if-you-re-unemployed/jobseeker-payment
+    evidence: JobSeeker
+
+  - id: mygov-baby-payments
+    question: what payments can I claim when I'm having a baby
+    style: plain
+    relevant:
+      - https://my.gov.au/en/services/raising-kids/having-a-baby/before-your-baby-arrives/payments-to-claim-when-having-a-baby
+      - https://my.gov.au/en/services/raising-kids/having-a-baby/before-your-baby-arrives/payments-to-claim-when-having-a-baby/parental-leave-pay
+    evidence: Parental Leave Pay
+
+  - id: mygov-birth-certificate
+    question: how do I register my baby's birth
+    style: plain
+    relevant: [https://my.gov.au/en/services/raising-kids/having-a-baby/when-your-baby-is-born/register-your-baby-s-birth-and-get-their-birth-certificate]
+    evidence: birth
+
+  # --- Starting and running a business (business.gov.au) ---------------------
+  - id: biz-name-cost
+    question: how much does it cost to register a business name
+    style: plain
+    relevant: [https://business.gov.au/registrations/register-your-business-name]
+    evidence: "$47"
+
+  - id: biz-licences
+    question: what licences and permits do I need for my business
+    style: official
+    relevant: [https://business.gov.au/registrations/register-licences-and-permits]
+    evidence: licence
+
+  - id: biz-sole-trader-vs-company
+    question: should I be a sole trader or a company
+    style: plain
+    relevant:
+      - https://business.gov.au/planning/business-structures-and-types/business-structures/difference-between-a-sole-trader-and-a-company
+      - https://business.gov.au/planning/business-structures-and-types/business-structures/choose-your-business-structure
+    evidence: sole trader
+
+  - id: biz-hobby
+    question: is selling stuff on the weekend a hobby or a business
+    style: plain
+    relevant: [https://business.gov.au/planning/new-businesses/difference-between-a-business-and-a-hobby]
+    evidence: hobby
+
+  - id: biz-foreigner
+    question: can I start a business in Australia if I'm not a citizen
+    style: plain
+    relevant: [https://business.gov.au/planning/new-businesses/start-a-business-in-australia-as-a-foreigner]
+    evidence: visa
+
+  - id: biz-trade-mark
+    question: is registering a business name the same as a trade mark
+    style: official
+    relevant:
+      - https://business.gov.au/planning/protect-your-brand-idea-or-creation/difference-between-a-business-name-and-a-trade-mark
+      - https://business.gov.au/planning/protect-your-brand-idea-or-creation/trade-mark
+    evidence: trade mark
+
+  - id: biz-employment-contract
+    question: what should go in an employment contract for my first employee
+    style: plain
+    relevant: [https://business.gov.au/people/employees/create-an-employment-contract]
+    evidence: contract
+
+  - id: biz-letter-of-demand
+    question: a customer won't pay my invoice, what can I do
+    style: plain
+    relevant:
+      - https://business.gov.au/people/disputes/write-a-letter-of-demand
+      - https://business.gov.au/people/disputes/debt-collection-services
+    evidence: demand
+
+  - id: biz-home-based
+    question: can I run a business from home
+    style: plain
+    relevant: [https://business.gov.au/planning/business-structures-and-types/home-based-businesses]
+    evidence: home

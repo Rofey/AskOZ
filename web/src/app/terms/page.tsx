@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function Terms() {
   return (
-    <LegalPage title="Terms of use" updated="30 October 2026">
+    <LegalPage title="Terms of use" updated="31 October 2026">
       <p>By using AskOz, you agree to these terms. Please read them, especially the first two.</p>
 
       <h2>AskOz is not the government</h2>
@@ -17,7 +17,8 @@ export default function Terms() {
         AskOz is an independent service. It is not affiliated with, endorsed by or operated by
         the Australian Government or any of its agencies, including the Australian Taxation
         Office, the Department of Home Affairs, the Australian Border Force, the Australian
-        Electoral Commission or Study Australia.
+        Electoral Commission, Study Australia, Services Australia (myGov) or the Department of
+        Industry, Science and Resources (business.gov.au).
       </p>
 
       <h2>General information, not advice</h2>

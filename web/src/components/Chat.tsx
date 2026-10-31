@@ -7,7 +7,9 @@ import {
   ExternalLink,
   EyeOff,
   Briefcase,
+  GradCap,
   HeartPulse,
+  IdCard,
   LogoMark,
   Passport,
   PiggyBank,
@@ -16,6 +18,7 @@ import {
   Quote,
   Receipt,
   ShieldCheck,
+  Store,
 } from "@/components/icons";
 import { LegalLinks } from "@/components/LegalPage";
 import { PromptBox } from "@/components/PromptBox";
@@ -50,6 +53,9 @@ const TOPICS = [
   { icon: PiggyBank, title: "Super", text: "Employer super, access, DASP", prompt: "When can I access my super?" },
   { icon: HeartPulse, title: "Medicare levy", text: "Levy, surcharge and the private health rebate", prompt: "Do I have to pay the Medicare levy surcharge?" },
   { icon: Briefcase, title: "Gig work & small business", text: "ABN, GST, rideshare, sole traders", prompt: "Do I need an ABN to drive for Uber?" },
+  { icon: Store, title: "Starting a business", text: "Business names, licences, hiring staff", prompt: "How much does it cost to register a business name?" },
+  { icon: IdCard, title: "myGov", text: "Signing in, linking services, Digital ID", prompt: "How do I link Medicare to my myGov account?" },
+  { icon: GradCap, title: "Studying in Australia", text: "Living costs, courses, working while studying", prompt: "How much does it cost to live in Australia as a student?" },
 ];
 
 const TRUST = [
